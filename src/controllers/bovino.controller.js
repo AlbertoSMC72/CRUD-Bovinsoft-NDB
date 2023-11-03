@@ -1,5 +1,5 @@
 const db = require('../configs/db')
-const vacaModel = require('../models/vaca.model');
+const vacaModel = require('../models/bovino.model');
 
 
 const index = async (req, res) => {
