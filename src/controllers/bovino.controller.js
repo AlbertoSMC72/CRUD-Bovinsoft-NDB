@@ -29,10 +29,10 @@ const index = async (req, res) => {
 };
 
 const getById = async (req, res) => {
-    const idVaca = req.params.id;
+    const idBovino = req.params.id;
 
     try {
-        const [vaca] = await db.execute('SELECT * FROM Vaca WHERE idVaca = ? AND (deleted = 0 OR deleted IS NULL)', [idVaca]);
+        const [vaca] = await db.execute('SELECT * FROM Vaca WHERE idBovino = ? AND (deleted = 0 OR deleted IS NULL)', [idBovino]);
 
         if (vaca.length === 0) {
             return res.status(404).json({ message: 'Vaca no encontrada' });
@@ -81,7 +81,7 @@ const create = async (req, res) => {
 };
 
 const update = async (req, res) => {
-    const idVaca = req.params.id;
+    const idBovino = req.params.id;
     const datosActualizados = req.body;
 
     try {
@@ -98,8 +98,8 @@ const update = async (req, res) => {
         const { siniiga, nombre, raza, genero, fechaNacimiento, fotoPerfil, lugarMarca, creadaAdministrador, borrado } = datosActualizados;
 
         await db.execute(
-            'UPDATE Vaca SET siniiga = ?, nombre = ?, raza = ?, genero = ?, fechaNacimiento = ?, fotoPerfil = ?, lugarMarca = ?, creadaAdministrador = ?, borrado = ?, updated = true, updated_at = ? WHERE idVaca = ?',
-            [siniiga || null, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, lugarMarca || null, creadaAdministrador, borrado, hoy, idVaca]
+            'UPDATE Vaca SET siniiga = ?, nombre = ?, raza = ?, genero = ?, fechaNacimiento = ?, fotoPerfil = ?, lugarMarca = ?, creadaAdministrador = ?, borrado = ?, updated = true, updated_at = ? WHERE idBovino = ?',
+            [siniiga || null, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, lugarMarca || null, creadaAdministrador, borrado, hoy, idBovino]
         );
 
         return res.status(200).json({
@@ -114,11 +114,11 @@ const update = async (req, res) => {
 };
 
 const deleteLogico = async (req, res) => {
-    const idVaca = req.params.id;
+    const idBovino = req.params.id;
     const hoy = new Date();
 
     try {
-        await db.execute('UPDATE Vaca SET deleted = true, deleted_at = ? WHERE idVaca = ?', [hoy, idVaca]);
+        await db.execute('UPDATE Vaca SET deleted = true, deleted_at = ? WHERE idBovino = ?', [hoy, idBovino]);
 
         return res.status(200).json({
             message: 'Vaca eliminada correctamente (lógicamente)',
@@ -132,10 +132,10 @@ const deleteLogico = async (req, res) => {
 };
 
 const deleteFisico = async (req, res) => {
-    const idVaca = req.params.id;
+    const idBovino = req.params.id;
 
     try {
-        await db.execute('DELETE FROM Vaca WHERE idVaca = ?', [idVaca]);
+        await db.execute('DELETE FROM Vaca WHERE idBovino = ?', [idBovino]);
 
         return res.status(200).json({
             message: 'Vaca eliminada correctamente (físicamente)',
