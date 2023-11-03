@@ -1,7 +1,6 @@
 const zod = require('zod');
 
 const vacaSchema = zod.object({
-    idBovino: zod.number().int(),
     siniiga: zod.string().nullable(),
     areteBovino: zod.string().nullable(),
     areteToro: zod.string().nullable(),
@@ -18,13 +17,10 @@ const vacaSchema = zod.object({
         invalid_type_error: "Gender must be a string",
         required_error: "Gender is required"
     }),
-    fechaNacimiento: zod.date(),
     fotoPerfil: zod.string().nullable(),
     pedigri: zod.string().nullable(),
     lugarMarca: zod.string().nullable(),
     creadaAdministrador: zod.number().int(),
-    borrado: zod.boolean().default(false),
-    updated_at: zod.date().nullable().default(new Date()),
 });
 
 const validarVaca = (object) => {

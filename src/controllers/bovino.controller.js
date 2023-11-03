@@ -32,7 +32,7 @@ const getById = async (req, res) => {
     const idBovino = req.params.id;
 
     try {
-        const [vaca] = await db.execute('SELECT * FROM bovino WHERE idBovino = ? AND (borrado = 0 OR borrado IS NULL)', [idBovino]);
+        const [vaca] = await db.execute('SELECT * FROM bovino WHERE idBovino = ?', [idBovino]);
 
         if (vaca.length === 0) {
             return res.status(404).json({ message: 'bovino no encontrada' });
@@ -52,7 +52,8 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        const validacion = vacaModel.validarVaca(req.body);
+
+        /* const validacion = vacaModel.validarVaca(req.body);
 
         if (!validacion.success) {
             return res.status(422).json({
@@ -60,13 +61,13 @@ const create = async (req, res) => {
                 error: JSON.parse(validacion.error.message),
             });
         }
+ */
 
-        const hoy = new Date();
-        const { siniiga, nombre, raza, genero, fechaNacimiento, fotoPerfil, lugarMarca, creadaAdministrador, borrado } = req.body;
+        const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, borrado } = req.body;
 
         await db.execute(
-            'INSERT INTO bovino (siniiga, nombre, raza, genero, fechaNacimiento, fotoPerfil, lugarMarca, creadaAdministrador, borrado, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [siniiga || null, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, lugarMarca || null, creadaAdministrador, borrado, hoy]
+            'INSERT INTO bovino (siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, borrado ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            [siniiga || null, areteBovino || null, areteToro || null, areteVaca || null, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, lugarMarca, creadaAdministrador, borrado]
         );
 
         return res.status(201).json({
@@ -85,25 +86,27 @@ const update = async (req, res) => {
     const datosActualizados = req.body;
 
     try {
-        const validacion = vacaModel.validarVaca(datosActualizados);
+        const { siniiga, fotoPerfil, lugarMarca, borrado, areteBovino, areteToro, areteVaca, pedigri } = datosActualizados;
+
+                /* const validacion = vacaModel.validarVaca(datosActualizados);
 
         if (!validacion.success) {
             return res.status(422).json({
                 message: 'Datos inválidos',
                 error: JSON.parse(validacion.error.message),
             });
-        }
+        } */
 
-        const hoy = new Date();
-        const { siniiga, nombre, raza, genero, fechaNacimiento, fotoPerfil, lugarMarca, creadaAdministrador, borrado } = datosActualizados;
+        /*         const hoy = new Date();
+         */
 
         await db.execute(
-            'UPDATE bovino SET siniiga = ?, nombre = ?, raza = ?, genero = ?, fechaNacimiento = ?, fotoPerfil = ?, lugarMarca = ?, creadaAdministrador = ?, borrado = ?, updated = true, updated_at = ? WHERE idBovino = ?',
-            [siniiga || null, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, lugarMarca || null, creadaAdministrador, borrado, hoy, idBovino]
+            'UPDATE bovino SET siniiga = ?, fotoPerfil = ?, lugarMarca = ?, borrado = ?, areteBovino = ?, areteToro = ?, areteVaca = ?, pedigri = ? WHERE idBovino = ?',
+            [siniiga || null, fotoPerfil || null, lugarMarca || null, borrado, areteBovino || null, areteToro || null, areteVaca || null, pedigri || null, idBovino]
         );
 
         return res.status(200).json({
-            message: 'bovino actualizada correctamente',
+            message: 'Bovino actualizado correctamente',
         });
     } catch (error) {
         return res.status(500).json({
@@ -115,10 +118,9 @@ const update = async (req, res) => {
 
 const deleteLogico = async (req, res) => {
     const idBovino = req.params.id;
-    const hoy = new Date();
 
     try {
-        await db.execute('UPDATE bovino SET borrado = true, deleted_at = ? WHERE idBovino = ?', [hoy, idBovino]);
+        await db.execute('UPDATE bovino SET borrado = 1 WHERE idBovino = ?', [idBovino]);
 
         return res.status(200).json({
             message: 'bovino eliminada correctamente (lógicamente)',
