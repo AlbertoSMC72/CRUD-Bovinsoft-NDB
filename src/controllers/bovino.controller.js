@@ -10,10 +10,10 @@ const index = async (req, res) => {
 
         if (page && limit) {
             vacas = await db.execute(
-                `SELECT * FROM Vaca WHERE deleted = 0 OR deleted IS NULL LIMIT ${skip},${limit}`
+                `SELECT * FROM bovino WHERE borrado = 0 OR borrado IS NULL LIMIT ${skip},${limit}`
             );
         } else {
-            vacas = await db.execute('SELECT * FROM Vaca WHERE deleted = 0 OR deleted IS NULL');
+            vacas = await db.execute('SELECT * FROM bovino WHERE borrado = 0 OR borrado IS NULL');
         }
 
         return res.status(200).json({
@@ -32,10 +32,10 @@ const getById = async (req, res) => {
     const idBovino = req.params.id;
 
     try {
-        const [vaca] = await db.execute('SELECT * FROM Vaca WHERE idBovino = ? AND (deleted = 0 OR deleted IS NULL)', [idBovino]);
+        const [vaca] = await db.execute('SELECT * FROM bovino WHERE idBovino = ? AND (borrado = 0 OR borrado IS NULL)', [idBovino]);
 
         if (vaca.length === 0) {
-            return res.status(404).json({ message: 'Vaca no encontrada' });
+            return res.status(404).json({ message: 'bovino no encontrada' });
         }
 
         return res.status(200).json({
@@ -65,16 +65,16 @@ const create = async (req, res) => {
         const { siniiga, nombre, raza, genero, fechaNacimiento, fotoPerfil, lugarMarca, creadaAdministrador, borrado } = req.body;
 
         await db.execute(
-            'INSERT INTO Vaca (siniiga, nombre, raza, genero, fechaNacimiento, fotoPerfil, lugarMarca, creadaAdministrador, borrado, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO bovino (siniiga, nombre, raza, genero, fechaNacimiento, fotoPerfil, lugarMarca, creadaAdministrador, borrado, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [siniiga || null, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, lugarMarca || null, creadaAdministrador, borrado, hoy]
         );
 
         return res.status(201).json({
-            message: 'Vaca creada exitosamente',
+            message: 'bovino creada exitosamente',
         });
     } catch (error) {
         return res.status(500).json({
-            message: 'Hubo un error en el servidor',
+            message: 'bovino un error en el servidor',
             error: error.message,
         });
     }
@@ -98,12 +98,12 @@ const update = async (req, res) => {
         const { siniiga, nombre, raza, genero, fechaNacimiento, fotoPerfil, lugarMarca, creadaAdministrador, borrado } = datosActualizados;
 
         await db.execute(
-            'UPDATE Vaca SET siniiga = ?, nombre = ?, raza = ?, genero = ?, fechaNacimiento = ?, fotoPerfil = ?, lugarMarca = ?, creadaAdministrador = ?, borrado = ?, updated = true, updated_at = ? WHERE idBovino = ?',
+            'UPDATE bovino SET siniiga = ?, nombre = ?, raza = ?, genero = ?, fechaNacimiento = ?, fotoPerfil = ?, lugarMarca = ?, creadaAdministrador = ?, borrado = ?, updated = true, updated_at = ? WHERE idBovino = ?',
             [siniiga || null, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, lugarMarca || null, creadaAdministrador, borrado, hoy, idBovino]
         );
 
         return res.status(200).json({
-            message: 'Vaca actualizada correctamente',
+            message: 'bovino actualizada correctamente',
         });
     } catch (error) {
         return res.status(500).json({
@@ -118,10 +118,10 @@ const deleteLogico = async (req, res) => {
     const hoy = new Date();
 
     try {
-        await db.execute('UPDATE Vaca SET deleted = true, deleted_at = ? WHERE idBovino = ?', [hoy, idBovino]);
+        await db.execute('UPDATE bovino SET borrado = true, deleted_at = ? WHERE idBovino = ?', [hoy, idBovino]);
 
         return res.status(200).json({
-            message: 'Vaca eliminada correctamente (lógicamente)',
+            message: 'bovino eliminada correctamente (lógicamente)',
         });
     } catch (error) {
         return res.status(500).json({
@@ -135,10 +135,10 @@ const deleteFisico = async (req, res) => {
     const idBovino = req.params.id;
 
     try {
-        await db.execute('DELETE FROM Vaca WHERE idBovino = ?', [idBovino]);
+        await db.execute('DELETE FROM bovino WHERE idBovino = ?', [idBovino]);
 
         return res.status(200).json({
-            message: 'Vaca eliminada correctamente (físicamente)',
+            message: 'bovino eliminada correctamente (físicamente)',
         });
     } catch (error) {
         return res.status(500).json({
