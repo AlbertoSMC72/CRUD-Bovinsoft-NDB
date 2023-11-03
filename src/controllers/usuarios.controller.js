@@ -45,7 +45,6 @@ const create = async (req, res) => {
         const { updated, deleted } = validacion.data
         const hoy = new Date()
         try {
-            //await db.execute(`Insert into usuarios (nombre, apellido, email) values ('${nombre}', '${apellido}', '${email}')`)
             await db.execute(`Insert into usuarios (nombre, apellido, email, updated, deleted, created_at values (?, ?, ?, ?, ?, ?)`, [nombre, apellido, email, updated, deleted, hoy])
 
             return res.status(201).json({
@@ -116,7 +115,6 @@ const updateCompleto = async (req, res) => {
 }
 
 const deleteLogico = async (req, res) => {
-
     try {
         const usuarioId = req.params.id
         const hoy = new Date()
