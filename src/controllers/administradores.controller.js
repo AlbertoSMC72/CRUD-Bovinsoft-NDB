@@ -1,6 +1,6 @@
 const db = require('../configs/db');
-const administradorModel = require('../models/administradores.model')
-const bcrypt = require('bcrypt')
+/* const administradorModel = require('../models/administradores.model')
+ */const bcrypt = require('bcrypt')
 const saltosBcrypt = process.env.SALTOS_BCRYPT
 
 
