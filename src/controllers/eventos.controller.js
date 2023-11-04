@@ -1,6 +1,6 @@
 const db = require('../configs/db');
-const eventoModel = require('../models/eventos.model');
-
+/* const eventoModel = require('../models/eventos.model');
+ */
 const index = async (req, res) => {
   try {
     const { page, limit } = req.query;
@@ -51,7 +51,7 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const validacion = eventoModel.validarEvento(req.body);
+   /*  const validacion = eventoModel.validarEvento(req.body);
 
     if (!validacion.success) {
       return res.status(422).json({
@@ -59,7 +59,7 @@ const create = async (req, res) => {
         error: JSON.parse(validacion.error.message),
       });
     }
-
+ */
     const { idBovino, titulo, asunto, descripcion, fecha_Reinsidio, eventoTerminado } = req.body;
     const fecha_Reporte = new Date();
 
@@ -84,14 +84,14 @@ const update = async (req, res) => {
   const datosActualizados = req.body;
 
   try {
-    const validacion = eventoModel.validarEvento(datosActualizados);
+   /*  const validacion = eventoModel.validarEvento(datosActualizados);
 
     if (!validacion.success) {
       return res.status(422).json({
         message: 'Datos inválidos',
         error: JSON.parse(validacion.error.message),
       });
-    }
+    } */
 
     const hoy = new Date();
     const { idBovino, titulo, asunto, fecha_Reporte, descripcion, fecha_Reinsidio, eventoTerminado } = datosActualizados;

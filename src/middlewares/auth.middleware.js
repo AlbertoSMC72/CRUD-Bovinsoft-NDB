@@ -1,23 +1,27 @@
 const jwt = require('jsonwebtoken');
-const jwtSecret = process.env.JWTSECRET;
+const dotenv = require('dotenv');
 
-const verificarJWT = (req, res, next) => {
-    const token = req.get('Authorization');
+dotenv.config();
 
-    jwt.verify(token, jwtSecret, (err, decode) => {
-        if (err) {
-            return res.status(401).send({
-                message: "error al validar token",
-                error: err.message
-            });
-        }
-
-        req.usuario = decode.usuario;
-        next();
-    })
-};
-
-
-module.exports = {
-    verificarJWT
+function verificarJWT(req, res, next) {
+    let token = req.get('Authorization');
+    if (token) {
+        // Se saca la palabra "Bearer", se usa como esquema y se deja el puro token
+        token = token.substring(7);
+        jwt.verify(token, process.env.JWTSECRET, (err, decodeToken) => {
+            if (err) {
+                return res.status(401).send({
+                    message: 'Token inválido',
+                    error: err.message,
+                });
+            }
+            req.usuario = decodeToken.usuario;
+            next();
+        });
+    }
+    if (!token) {
+        return res.status(401).send({ message: 'Token inexistente' });
+    }
 }
+
+module.exports = { verificarJWT };

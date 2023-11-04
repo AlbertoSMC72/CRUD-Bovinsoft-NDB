@@ -10,10 +10,10 @@ const index = async (req, res) => {
 
         if (page && limit) {
             vacas = await db.execute(
-                `SELECT * FROM Vaca WHERE deleted = 0 OR deleted IS NULL LIMIT ${skip},${limit}`
+                `SELECT * FROM bovino WHERE borrado = 0 OR borrado IS NULL LIMIT ${skip},${limit}`
             );
         } else {
-            vacas = await db.execute('SELECT * FROM Vaca WHERE deleted = 0 OR deleted IS NULL');
+            vacas = await db.execute('SELECT * FROM bovino WHERE borrado = 0 OR borrado IS NULL');
         }
 
         return res.status(200).json({
@@ -32,10 +32,10 @@ const getById = async (req, res) => {
     const idBovino = req.params.id;
 
     try {
-        const [vaca] = await db.execute('SELECT * FROM Vaca WHERE idBovino = ? AND (deleted = 0 OR deleted IS NULL)', [idBovino]);
+        const [vaca] = await db.execute('SELECT * FROM bovino WHERE idBovino = ?', [idBovino]);
 
         if (vaca.length === 0) {
-            return res.status(404).json({ message: 'Vaca no encontrada' });
+            return res.status(404).json({ message: 'bovino no encontrada' });
         }
 
         return res.status(200).json({
@@ -52,7 +52,8 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        const validacion = vacaModel.validarVaca(req.body);
+
+        /* const validacion = vacaModel.validarVaca(req.body);
 
         if (!validacion.success) {
             return res.status(422).json({
@@ -60,21 +61,21 @@ const create = async (req, res) => {
                 error: JSON.parse(validacion.error.message),
             });
         }
+ */
 
-        const hoy = new Date();
-        const { siniiga, nombre, raza, genero, fechaNacimiento, fotoPerfil, lugarMarca, creadaAdministrador, borrado } = req.body;
+        const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, borrado } = req.body;
 
         await db.execute(
-            'INSERT INTO Vaca (siniiga, nombre, raza, genero, fechaNacimiento, fotoPerfil, lugarMarca, creadaAdministrador, borrado, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [siniiga || null, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, lugarMarca || null, creadaAdministrador, borrado, hoy]
+            'INSERT INTO bovino (siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, borrado ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            [siniiga || null, areteBovino || null, areteToro || null, areteVaca || null, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, lugarMarca, creadaAdministrador, borrado]
         );
 
         return res.status(201).json({
-            message: 'Vaca creada exitosamente',
+            message: 'bovino creada exitosamente',
         });
     } catch (error) {
         return res.status(500).json({
-            message: 'Hubo un error en el servidor',
+            message: 'bovino un error en el servidor',
             error: error.message,
         });
     }
@@ -85,25 +86,27 @@ const update = async (req, res) => {
     const datosActualizados = req.body;
 
     try {
-        const validacion = vacaModel.validarVaca(datosActualizados);
+        const { siniiga, fotoPerfil, lugarMarca, borrado, areteBovino, areteToro, areteVaca, pedigri } = datosActualizados;
+
+                /* const validacion = vacaModel.validarVaca(datosActualizados);
 
         if (!validacion.success) {
             return res.status(422).json({
                 message: 'Datos inválidos',
                 error: JSON.parse(validacion.error.message),
             });
-        }
+        } */
 
-        const hoy = new Date();
-        const { siniiga, nombre, raza, genero, fechaNacimiento, fotoPerfil, lugarMarca, creadaAdministrador, borrado } = datosActualizados;
+        /*         const hoy = new Date();
+         */
 
         await db.execute(
-            'UPDATE Vaca SET siniiga = ?, nombre = ?, raza = ?, genero = ?, fechaNacimiento = ?, fotoPerfil = ?, lugarMarca = ?, creadaAdministrador = ?, borrado = ?, updated = true, updated_at = ? WHERE idBovino = ?',
-            [siniiga || null, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, lugarMarca || null, creadaAdministrador, borrado, hoy, idBovino]
+            'UPDATE bovino SET siniiga = ?, fotoPerfil = ?, lugarMarca = ?, borrado = ?, areteBovino = ?, areteToro = ?, areteVaca = ?, pedigri = ? WHERE idBovino = ?',
+            [siniiga || null, fotoPerfil || null, lugarMarca || null, borrado, areteBovino || null, areteToro || null, areteVaca || null, pedigri || null, idBovino]
         );
 
         return res.status(200).json({
-            message: 'Vaca actualizada correctamente',
+            message: 'Bovino actualizado correctamente',
         });
     } catch (error) {
         return res.status(500).json({
@@ -115,13 +118,12 @@ const update = async (req, res) => {
 
 const deleteLogico = async (req, res) => {
     const idBovino = req.params.id;
-    const hoy = new Date();
 
     try {
-        await db.execute('UPDATE Vaca SET deleted = true, deleted_at = ? WHERE idBovino = ?', [hoy, idBovino]);
+        await db.execute('UPDATE bovino SET borrado = 1 WHERE idBovino = ?', [idBovino]);
 
         return res.status(200).json({
-            message: 'Vaca eliminada correctamente (lógicamente)',
+            message: 'bovino eliminada correctamente (lógicamente)',
         });
     } catch (error) {
         return res.status(500).json({
@@ -135,10 +137,10 @@ const deleteFisico = async (req, res) => {
     const idBovino = req.params.id;
 
     try {
-        await db.execute('DELETE FROM Vaca WHERE idBovino = ?', [idBovino]);
+        await db.execute('DELETE FROM bovino WHERE idBovino = ?', [idBovino]);
 
         return res.status(200).json({
-            message: 'Vaca eliminada correctamente (físicamente)',
+            message: 'bovino eliminada correctamente (físicamente)',
         });
     } catch (error) {
         return res.status(500).json({
