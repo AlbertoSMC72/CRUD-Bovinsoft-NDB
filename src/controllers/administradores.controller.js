@@ -1,5 +1,8 @@
 const db = require('../configs/db');
 const administradorModel = require('../models/administradores.model')
+const bcrypt = require('bcrypt')
+const saltosBcrypt = process.env.SALTOS_BCRYPT
+
 
 const index = async (req, res) => {
     try {
@@ -48,21 +51,12 @@ const getbyID = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        const validacion = administradorModel.validarAdministrador(req.body);
-
-        if (!validacion.success) {
-            return res.status(422).json({
-                message: 'Datos inválidos',
-                error: validacion.error.issues,
-            });
-        }
-
-        const { usuario, password } = req.body;
-        const hoy = new Date();
+        
+        const password = bcrypt.hashSync(req.body.password,  parseInt(saltosBcrypt))
+        const usuario = req.body.usuario
 
         try {
-            await db.execute('INSERT INTO Administradores (usuario, password, created_at) VALUES (?, ?, ?)',
-                [usuario, password, hoy]);
+            await db.execute('INSERT INTO Administradores (usuario, password) VALUES (?, ?)', [usuario, password]);
 
             return res.status(201).json({
                 message: 'Administrador creado exitosamente',
