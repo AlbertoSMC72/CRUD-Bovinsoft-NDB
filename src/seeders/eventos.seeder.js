@@ -10,15 +10,7 @@ const eventos = [
     fecha_Reporte: '2023-11-10', 
     descripcion: 'Descripción del evento 1',
     fecha_Reinsidio: '2023-11-11', 
-  },
-  {
-    idBovino: 2, 
-    titulo: 'Evento 2', 
-    asunto: 'Asunto 2', 
-    fecha_Reporte: '2023-11-15', 
-    descripcion: 'Descripción del evento 2', 
-    fecha_Reinsidio: '2023-11-16', 
-  },
+  }
 
 ];
 
