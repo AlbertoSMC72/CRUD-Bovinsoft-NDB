@@ -1,7 +1,7 @@
 const zod = require('zod');
 
 const vacaSchema = zod.object({
-    idVaca: zod.number().int(),
+    idBovino: zod.number().int(),
     siniiga: zod.string().nullable(),
     areteBovino: zod.string().nullable(),
     areteToro: zod.string().nullable(),
