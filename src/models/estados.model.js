@@ -1,7 +1,7 @@
-const zod = require('zod');
+const zod = require('zod'); 
 
 const estadoSchema = zod.object({
-    idVaca: zod.number().int(),
+    idBovino: zod.number().int(),
     estado: zod.string({
         invalid_type_error: "State must be a string",
         required_error: "State is required"

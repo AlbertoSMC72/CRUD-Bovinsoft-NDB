@@ -2,6 +2,7 @@ const db = require('../configs/db');
 /* const estadosModel = require('../models/estados.model');
  */
 
+
 const index = async (req, res) => {
   try {
     const estados = await db.execute('SELECT * FROM Estado');
@@ -52,7 +53,7 @@ const create = async (req, res) => {
  */
     const { idBovino, estado } = req.body;
 
-    await db.execute('INSERT INTO Estado (idVaca, estado) VALUES (?, ?)', [idBovino, estado]);
+    await db.execute('INSERT INTO Estado (idBovino, estado) VALUES (?, ?)', [idBovino, estado]);
 
     return res.status(201).json({
       message: 'Estado creado exitosamente',
@@ -81,7 +82,7 @@ const update = async (req, res) => {
 
     const { idBovino, estado } = datosActualizados;
 
-    await db.execute('UPDATE Estado SET idVaca = ?, estado = ? WHERE idEstado = ?', [idBovino, estado, idEstado]);
+    await db.execute('UPDATE Estado SET idBovino = ?, estado = ? WHERE idEstado = ?', [idBovino, estado, idEstado]);
 
     return res.status(200).json({
       message: 'Estado actualizado correctamente',
