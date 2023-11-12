@@ -1,6 +1,4 @@
 const db = require('../configs/db');
-/* const estadosModel = require('../models/estados.model');
- */
 
 
 const index = async (req, res) => {
@@ -42,15 +40,6 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    /* const validacion = estadosModel.validarEstado(req.body);
-
-    if (!validacion.success) {
-      return res.status(422).json({
-        message: 'Datos inválidos',
-        error: JSON.parse(validacion.error.message),
-      });
-    }
- */
     const { idBovino, estado } = req.body;
 
     await db.execute('INSERT INTO Estado (idBovino, estado) VALUES (?, ?)', [idBovino, estado]);
@@ -71,14 +60,6 @@ const update = async (req, res) => {
   const datosActualizados = req.body;
 
   try {
-   /*  const validacion = estadosModel.validarEstado(datosActualizados);
-
-    if (!validacion.success) {
-      return res.status(422).json({
-        message: 'Datos inválidos',
-        error: JSON.parse(validacion.error.message),
-      });
-    } */
 
     const { idBovino, estado } = datosActualizados;
 

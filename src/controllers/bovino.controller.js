@@ -1,5 +1,4 @@
 const db = require('../configs/db')
-const vacaModel = require('../models/bovino.model');
 
 
 const index = async (req, res) => {
@@ -10,7 +9,7 @@ const index = async (req, res) => {
 
         if (page && limit) {
             vacas = await db.execute(
-                `SELECT * FROM bovino WHERE borrado = 0 OR borrado IS NULL LIMIT ${skip},${limit}`
+                `SELECT * FROM bovino WHERE borrado = 0 OR borrado IS NULL LIMIT ${skip},${limit} ` /* agregar order by */
             );
         } else {
             vacas = await db.execute('SELECT * FROM bovino WHERE borrado = 0 OR borrado IS NULL');
@@ -52,22 +51,18 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-
-        /* const validacion = vacaModel.validarVaca(req.body);
-
-        if (!validacion.success) {
-            return res.status(422).json({
-                message: 'Datos inválidos',
-                error: JSON.parse(validacion.error.message),
-            });
-        }
- */
-
         const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, borrado } = req.body;
 
+        // Obtener los idBovino correspondientes a los aretes de los padres
+        const [idToroResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteToro]);
+        const [idVacaResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteVaca]);
+
+        const idToro = idToroResult[0] ? idToroResult[0].idBovino : null;
+        const idVaca = idVacaResult[0] ? idVacaResult[0].idBovino : null;
+
         await db.execute(
-            'INSERT INTO bovino (siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, borrado ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-            [siniiga || null, areteBovino || null, areteToro || null, areteVaca || null, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, lugarMarca, creadaAdministrador, borrado]
+            'INSERT INTO bovino (siniiga, areteBovino, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, borrado ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            [siniiga || null, areteBovino || null, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, lugarMarca, creadaAdministrador, borrado]
         );
 
         return res.status(201).json({
@@ -81,6 +76,7 @@ const create = async (req, res) => {
     }
 };
 
+
 const update = async (req, res) => {
     const idBovino = req.params.id;
     const datosActualizados = req.body;
@@ -88,21 +84,16 @@ const update = async (req, res) => {
     try {
         const { siniiga, fotoPerfil, lugarMarca, borrado, areteBovino, areteToro, areteVaca, pedigri } = datosActualizados;
 
-                /* const validacion = vacaModel.validarVaca(datosActualizados);
+        // Obtener los idBovino correspondientes a los aretes de los padres
+        const [idToroResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteToro]);
+        const [idVacaResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteVaca]);
 
-        if (!validacion.success) {
-            return res.status(422).json({
-                message: 'Datos inválidos',
-                error: JSON.parse(validacion.error.message),
-            });
-        } */
-
-        /*         const hoy = new Date();
-         */
+        const idToro = idToroResult[0] ? idToroResult[0].idBovino : null;
+        const idVaca = idVacaResult[0] ? idVacaResult[0].idBovino : null;
 
         await db.execute(
-            'UPDATE bovino SET siniiga = ?, fotoPerfil = ?, lugarMarca = ?, borrado = ?, areteBovino = ?, areteToro = ?, areteVaca = ?, pedigri = ? WHERE idBovino = ?',
-            [siniiga || null, fotoPerfil || null, lugarMarca || null, borrado, areteBovino || null, areteToro || null, areteVaca || null, pedigri || null, idBovino]
+            'UPDATE bovino SET siniiga = ?, fotoPerfil = ?, lugarMarca = ?, borrado = ?, areteBovino = ?, idToro = ?, idVaca = ?, pedigri = ? WHERE idBovino = ?',
+            [siniiga || null, fotoPerfil || null, lugarMarca || null, borrado, areteBovino || null, idToro, idVaca, pedigri || null, idBovino]
         );
 
         return res.status(200).json({
@@ -116,11 +107,14 @@ const update = async (req, res) => {
     }
 };
 
+
 const deleteLogico = async (req, res) => {
     const idBovino = req.params.id;
 
     try {
-        await db.execute('UPDATE bovino SET borrado = 1 WHERE idBovino = ?', [idBovino]);
+        const fechaBorrado = new Date();
+
+        await db.execute('UPDATE bovino SET deleted = 1, deleted_at = ? WHERE idBovino = ?', [fechaBorrado, idBovino]);
 
         return res.status(200).json({
             message: 'bovino eliminada correctamente (lógicamente)',
@@ -132,6 +126,7 @@ const deleteLogico = async (req, res) => {
         });
     }
 };
+
 
 const deleteFisico = async (req, res) => {
     const idBovino = req.params.id;

@@ -53,10 +53,10 @@ const create = async (req, res) => {
     try {
         
         const password = bcrypt.hashSync(req.body.password,  parseInt(saltosBcrypt))
-        const usuario = req.body.usuario
+        const correo = req.body.correo
 
         try {
-            await db.execute('INSERT INTO Administradores (usuario, password) VALUES (?, ?)', [usuario, password]);
+            await db.execute('INSERT INTO Administradores (correo, password) VALUES (?, ?)', [correo, password]);
 
             return res.status(201).json({
                 message: 'Administrador creado exitosamente',
@@ -78,12 +78,12 @@ const create = async (req, res) => {
 const update = async (req, res) => {
     try {
         const adminId = req.params.id;
-        const { usuario, password } = req.body;
+        const { correo, password } = req.body;
         const hoy = new Date();
 
         try {
-            await db.execute('UPDATE Administradores SET usuario = ?, password = ?, updated_at = ? WHERE idAdministrador = ?',
-                [usuario, password, hoy, adminId]);
+            await db.execute('UPDATE Administradores SET correo = ?, password = ?, updated_at = ? WHERE idAdministrador = ?',
+                [correo, password, hoy, adminId]);
 
             return res.status(200).json({
                 message: 'Administrador actualizado correctamente',

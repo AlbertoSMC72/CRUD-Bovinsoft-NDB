@@ -6,12 +6,12 @@ const jwt = require('jsonwebtoken')
 
 const login = async (req, res) =>{
     try {
-        const {usuario, password} = req.body;
+        const {correo, password} = req.body;
 
-        const usuarioEncontrado = await db.execute('select * from administradores where usuario = ?', [usuario]);
+        const usuarioEncontrado = await db.execute('select * from administradores where correo = ?', [correo]);
         if (usuarioEncontrado[0].length == 0) {
             return res.status(400).json({
-                message: "usuario o password incorrecto"
+                message: "correo o password incorrecto"
             });
         }
 
@@ -19,12 +19,12 @@ const login = async (req, res) =>{
         
         if (!passwordCorrecto) {
             return res.status(400).json({
-                message: "usuario o password incorrecto"
+                message: "correo o password incorrecto"
             });
         }
 
         const payload = {
-            usuario: {
+            correo: {
                 id: usuarioEncontrado[0][0].id
             }
         }

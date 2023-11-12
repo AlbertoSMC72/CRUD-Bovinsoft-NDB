@@ -1,6 +1,5 @@
 const db = require('../configs/db');
-/* const eventoModel = require('../models/eventos.model');
- */
+
 const index = async (req, res) => {
   try {
     const { page, limit } = req.query;
@@ -51,15 +50,6 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-   /*  const validacion = eventoModel.validarEvento(req.body);
-
-    if (!validacion.success) {
-      return res.status(422).json({
-        message: 'Datos inválidos',
-        error: JSON.parse(validacion.error.message),
-      });
-    }
- */
     const { idBovino, titulo, asunto, descripcion, fecha_Reinsidio, eventoTerminado } = req.body;
     const fecha_Reporte = new Date();
 
@@ -81,38 +71,36 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
   const idEvento = req.params.id;
-  const datosActualizados = req.body;
-
+  const {titulo, asunto, descripcion, fecha_Reinsidio } = datosActualizados;
+  const hoy = new Date();
   try {
-   /*  const validacion = eventoModel.validarEvento(datosActualizados);
-
-    if (!validacion.success) {
-      return res.status(422).json({
-        message: 'Datos inválidos',
-        error: JSON.parse(validacion.error.message),
-      });
-    } */
-
-    const hoy = new Date();
-    const { idBovino, titulo, asunto, fecha_Reporte, descripcion, fecha_Reinsidio, eventoTerminado } = datosActualizados;
-
     await db.execute(
-      'UPDATE Eventos SET idBovino = ?, titulo = ?, asunto = ?, fecha_Reporte = ?, descripcion = ?, fecha_Reinsidio = ?, eventoTerminado = ?, updated = true, updated_at = ? WHERE idEvento = ?',
-      [
-        idBovino,
-        titulo,
-        asunto || null,
-        fecha_Reporte,
-        descripcion || null,
-        fecha_Reinsidio || null,
-        eventoTerminado,
-        hoy,
-        idEvento,
-      ]
+      'UPDATE Eventos SET titulo = ?, asunto = ?, descripcion = ?, fecha_Reinsidio = ?, updated_at = ? WHERE idEvento = ?',
+      [titulo, asunto || null, descripcion || null, fecha_Reinsidio || null, hoy, idEvento]
     );
 
     return res.status(200).json({
       message: 'Evento actualizado correctamente',
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Hubo un error en el servidor al actualizar el evento',
+      error: error.message,
+    });
+  }
+};
+
+
+const deleteLogico = async (req, res) => {
+  const idEvento = req.params.id;
+  const hoy = new Date();
+
+  try {
+    await db.execute('UPDATE Eventos SET delete = 1, deleted_at = ? WHERE idEvento = ?', [hoy, idEvento]);
+
+    return res.status(200).json({
+      message: 'Evento eliminado (lógicamente) correctamente',
     });
   } catch (error) {
     return res.status(500).json({
@@ -122,12 +110,12 @@ const update = async (req, res) => {
   }
 };
 
-const deleteLogico = async (req, res) => {
+const eventoTerminado = async (req, res) => {
   const idEvento = req.params.id;
   const hoy = new Date();
 
   try {
-    await db.execute('UPDATE Eventos SET eventoTerminado = 1, updated = true, updated_at = ? WHERE idEvento = ?', [hoy, idEvento]);
+    await db.execute('UPDATE Eventos SET eventoTerminado = 1, updated_at = ? WHERE idEvento = ?', [hoy, idEvento]);
 
     return res.status(200).json({
       message: 'Evento eliminado (lógicamente) correctamente',
@@ -162,6 +150,7 @@ module.exports = {
   getById,
   create,
   update,
+  eventoTerminado,
   deleteLogico,
   deleteFisico,
 };
