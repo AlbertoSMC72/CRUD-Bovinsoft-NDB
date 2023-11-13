@@ -42,6 +42,16 @@ const create = async (req, res) => {
   try {
     const { idBovino, estado } = req.body;
 
+    // Verificar si ya existe un evento para la vaca con el mismo estado
+    const existingEvent = await db.execute('SELECT idEstado FROM Estado WHERE idBovino = ? AND estado = ?', [idBovino, estado]);
+
+    if (existingEvent && existingEvent.length > 0) {
+      return res.status(400).json({
+        message: 'Ya existe un evento para esta vaca con el mismo estado',
+      });
+    }
+
+    // Si no existe, crear el nuevo evento
     await db.execute('INSERT INTO Estado (idBovino, estado) VALUES (?, ?)', [idBovino, estado]);
 
     return res.status(201).json({

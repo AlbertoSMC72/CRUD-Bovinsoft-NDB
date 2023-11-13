@@ -1,4 +1,5 @@
 const db = require('../configs/db');
+const Estados = require('../controllers/estados.controller');
 
 const index = async (req, res) => {
   try {
@@ -48,10 +49,22 @@ const getById = async (req, res) => {
   }
 };
 
+async function actualizarEstado(idBovino, asunto) {
+  await Estados.create(idBovino, asunto);
+}
+
 const create = async (req, res) => {
   try {
     const { idBovino, titulo, asunto, descripcion, fecha_Reinsidio, eventoTerminado } = req.body;
     const fecha_Reporte = new Date();
+
+    const asuntosPosibles = ['cargada', 'enferma', 'esperInseminar', 'nacimientoEsp', 'lecionada', 'fueraFinca', 'favorito', 'vendido', 'muerta'];
+
+    if (asuntosPosibles.includes(asunto)) {
+      await actualizarEstado(idBovino, asuntoACambiar);
+    } else if (asunto === null) {
+      console.log('No se actualiza el estado del bovino');
+    }
 
     await db.execute(
       'INSERT INTO Eventos (idBovino, titulo, asunto, fecha_Reporte, descripcion, fecha_Reinsidio, eventoTerminado) VALUES (?, ?, ?, ?, ?, ?, ?)',
