@@ -11,9 +11,9 @@ const index = async (req, res) => {
         let administradores;
 
         if (page && limit) {
-            administradores = await db.execute(`SELECT * FROM Administradores WHERE deleted = 0 OR deleted IS NULL LIMIT ${skip},${limit}`);
+            administradores = await db.execute(`SELECT * FROM Administradores LIMIT ${skip},${limit}`);
         } else {
-            administradores = await db.execute('SELECT * FROM Administradores WHERE deleted = 0 OR deleted IS NULL');
+            administradores = await db.execute('SELECT * FROM Administradores');
         }
 
         return res.status(200).json({
