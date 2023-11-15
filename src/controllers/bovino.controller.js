@@ -30,22 +30,10 @@ const index = async (req, res) => {
 /* para buscar */
 const buscar = async (req, res) => {
     try {
-        const { term } = req.query;
-
-        if (!term) {
-            return res.status(400).json({
-                message: 'Se requiere un término de búsqueda',
-            });
-        }
-
-        const resultados = await db.execute(
-            'SELECT nombre, areteBovino FROM bovino WHERE (nombre LIKE ? OR areteBovino LIKE ?) AND (borrado = 0 OR borrado IS NULL)',
-            [`%${term}%`, `%${term}%`]
-        );
-
+        await db.execute('SELECT idBovino,nombre,areteBovino FROM bovino WHERE borrado = 0 OR borrado IS NULL');
         return res.status(200).json({
-            message: 'Resultados de búsqueda obtenidos correctamente',
-            resultados: resultados[0],
+            message: 'Vacas obtenidas correctamente',
+            vacas: vacas[0],
         });
     } catch (error) {
         return res.status(500).json({
