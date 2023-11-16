@@ -10,6 +10,7 @@ router.get('/:id', authMiddleware.verificarJWT,  bovinosController.getById);
 router.post('/',  authMiddleware.verificarJWT, bovinosController.create);
 router.put('/:id', authMiddleware.verificarJWT, bovinosController.update);
 router.patch('/borradoLogico/:id',  authMiddleware.verificarJWT, bovinosController.deleteLogico);
+router.patch('/restaurarLogico/:id', authMiddleware.verificarJWT, bovinosController.deleteLogicoInverso);
 router.delete('/borrado/:id', authMiddleware.verificarJWT, bovinosController.deleteFisico);
 
 module.exports = router;

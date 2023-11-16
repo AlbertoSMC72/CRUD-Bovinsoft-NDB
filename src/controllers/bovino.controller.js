@@ -153,6 +153,26 @@ const deleteLogico = async (req, res) => {
     }
 };
 
+const deleteLogicoInverso = async (req, res) => {
+    const idBovino = req.params.id;
+
+    try {
+        const fechaBorrado = new Date();
+
+        await db.execute('UPDATE bovino SET deleted = 0, deleted_at = ? WHERE idBovino = ?', [fechaBorrado, idBovino]);
+
+        return res.status(200).json({
+            message: 'bovino restaurado correctamente ',
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Hubo un error en el servidor',
+            error: error.message,
+        });
+    }
+};
+
+
 
 const deleteFisico = async (req, res) => {
     const idBovino = req.params.id;
@@ -194,5 +214,6 @@ module.exports = {
     create,
     update,
     deleteLogico,
+    deleteLogicoInverso,
     deleteFisico,
 };
