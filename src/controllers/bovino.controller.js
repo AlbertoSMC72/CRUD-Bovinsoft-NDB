@@ -9,10 +9,10 @@ const index = async (req, res) => {
 
         if (page && limit) {
             vacas = await db.execute(
-                `SELECT * FROM bovino WHERE borrado = 0 OR borrado IS NULL LIMIT ${skip},${limit} ` /* agregar order by */
+                `SELECT * FROM Bovino WHERE deleted = 0 OR deleted IS NULL LIMIT ${skip},${limit} ` /* agregar order by */
             );
         } else {
-            vacas = await db.execute('SELECT * FROM bovino WHERE borrado = 0 OR borrado IS NULL');
+            vacas = await db.execute('SELECT * FROM Bovino WHERE deleted = 0 OR deleted IS NULL');
         }
 
         return res.status(200).json({
@@ -27,10 +27,20 @@ const index = async (req, res) => {
     }
 };
 
-/* para buscar */
-const buscar = async (req, res) => {
+const indexBorrados = async (req, res) => {
     try {
-        await db.execute('SELECT idBovino,nombre,areteBovino FROM bovino WHERE borrado = 0 OR borrado IS NULL');
+        const { page, limit } = req.query;
+        const skip = (page - 1) * limit;
+        let vacas;
+
+        if (page && limit) {
+            vacas = await db.execute(
+                `SELECT * FROM Bovino WHERE deleted = 1 LIMIT ${skip},${limit} ` 
+            );
+        } else {
+            vacas = await db.execute('SELECT * FROM Bovino WHERE deleted = 1 ');
+        }
+
         return res.status(200).json({
             message: 'Vacas obtenidas correctamente',
             vacas: vacas[0],
@@ -47,7 +57,7 @@ const getById = async (req, res) => {
     const idBovino = req.params.id;
 
     try {
-        const [vaca] = await db.execute('SELECT * FROM bovino WHERE idBovino = ?', [idBovino]);
+        const [vaca] = await db.execute('SELECT * FROM Bovino WHERE idBovino = ?', [idBovino]);
 
         if (vaca.length === 0) {
             return res.status(404).json({ message: 'bovino no encontrada' });
@@ -67,7 +77,7 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, borrado } = req.body;
+        const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, deleted } = req.body;
 
         // Obtener los idBovino correspondientes a los aretes de los padres
         const [idToroResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteToro]);
@@ -77,8 +87,8 @@ const create = async (req, res) => {
         const idVaca = idVacaResult[0] ? idVacaResult[0].idBovino : null;
 
         await db.execute(
-            'INSERT INTO bovino (siniiga, areteBovino, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, borrado ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-            [siniiga || null, areteBovino || null, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, lugarMarca, creadaAdministrador, borrado]
+            'INSERT INTO bovino (siniiga, areteBovino, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, deleted ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            [siniiga || null, areteBovino || null, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, lugarMarca, creadaAdministrador, deleted]
         );
 
         return res.status(201).json({
@@ -98,7 +108,7 @@ const update = async (req, res) => {
     const datosActualizados = req.body;
 
     try {
-        const { siniiga, fotoPerfil, lugarMarca, borrado, areteBovino, areteToro, areteVaca, pedigri } = datosActualizados;
+        const { siniiga, fotoPerfil, lugarMarca, deleted, areteBovino, areteToro, areteVaca, pedigri } = datosActualizados;
 
         // Obtener los idBovino correspondientes a los aretes de los padres
         const [idToroResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteToro]);
@@ -108,8 +118,8 @@ const update = async (req, res) => {
         const idVaca = idVacaResult[0] ? idVacaResult[0].idBovino : null;
 
         await db.execute(
-            'UPDATE bovino SET siniiga = ?, fotoPerfil = ?, lugarMarca = ?, borrado = ?, areteBovino = ?, idToro = ?, idVaca = ?, pedigri = ? WHERE idBovino = ?',
-            [siniiga || null, fotoPerfil || null, lugarMarca || null, borrado, areteBovino || null, idToro, idVaca, pedigri || null, idBovino]
+            'UPDATE bovino SET siniiga = ?, fotoPerfil = ?, lugarMarca = ?, deleted = ?, areteBovino = ?, idToro = ?, idVaca = ?, pedigri = ? WHERE idBovino = ?',
+            [siniiga || null, fotoPerfil || null, lugarMarca || null, deleted, areteBovino || null, idToro, idVaca, pedigri || null, idBovino]
         );
 
         return res.status(200).json({
@@ -148,7 +158,7 @@ const deleteFisico = async (req, res) => {
     const idBovino = req.params.id;
 
     try {
-        await db.execute('DELETE FROM bovino WHERE idBovino = ?', [idBovino]);
+        await db.execute('DELETE FROM Bovino WHERE idBovino = ?', [idBovino]);
 
         return res.status(200).json({
             message: 'bovino eliminada correctamente (físicamente)',
@@ -161,9 +171,25 @@ const deleteFisico = async (req, res) => {
     }
 };
 
+const buscarHijos = async (req, res) => {
+    try {
+        await date.execute('SELECT idBovino,areteBovino,nombre FROM Bovino WHERE idToro = ? OR idVaca = ?', [idBovino, idBovino]);
+        return res.status(200).json({
+            message: 'Vacas obtenidas correctamente',
+            vacas: vacas[0],
+        });
+    } catch (error) {   
+        return res.status(500).json({
+            message: 'Hubo un error en el servidor',
+            error: error.message,
+        });
+    }
+}
+
 module.exports = {
     index,
-    buscar,
+    indexBorrados,
+    buscarHijos,
     getById,
     create,
     update,

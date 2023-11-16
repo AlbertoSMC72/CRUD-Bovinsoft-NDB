@@ -4,7 +4,8 @@ const authMiddleware = require('../middlewares/auth.middleware');
 const bovinosController = require('../controllers/bovino.controller');
 
 router.get('/', authMiddleware.verificarJWT,  bovinosController.index);
-router.get('/buscar', authMiddleware.verificarJWT,  bovinosController.buscar);
+router.get('/borrados', authMiddleware.verificarJWT,  bovinosController.indexBorrados);
+router.get('/hijos' , authMiddleware.verificarJWT, bovinosController.buscarHijos);
 router.get('/:id', authMiddleware.verificarJWT,  bovinosController.getById);
 router.post('/',  authMiddleware.verificarJWT, bovinosController.create);
 router.put('/:id', authMiddleware.verificarJWT, bovinosController.update);

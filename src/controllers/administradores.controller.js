@@ -51,7 +51,6 @@ const getbyID = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        
         const password = bcrypt.hashSync(req.body.password,  parseInt(saltosBcrypt))
         const correo = req.body.correo
 
