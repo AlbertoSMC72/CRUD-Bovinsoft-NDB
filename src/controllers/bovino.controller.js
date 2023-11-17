@@ -193,7 +193,7 @@ const deleteFisico = async (req, res) => {
 
 const buscarHijos = async (req, res) => {
     try {
-        await date.execute('SELECT idBovino,areteBovino,nombre FROM Bovino WHERE idToro = ? OR idVaca = ?', [idBovino, idBovino]);
+        await date.execute('SELECT idBovino,areteBovino,nombre FROM Bovino WHERE idToro = ? OR idVaca = ? and deleted = 0 OR deleted IS NULL', [idBovino, idBovino]);
         return res.status(200).json({
             message: 'Vacas obtenidas correctamente',
             vacas: vacas[0],
@@ -208,7 +208,7 @@ const buscarHijos = async (req, res) => {
 
 const buscador = async (req, res) => {
     try {
-        await date.execute('SELECT idBovino,areteBovino,nombre FROM Bovino');
+        await date.execute('SELECT idBovino,areteBovino,nombre FROM Bovino WHERE deleted = 0 OR deleted IS NULL');
         return res.status(200).json({
             message: 'Vacas obtenidas correctamente',
             vacas: vacas[0],
