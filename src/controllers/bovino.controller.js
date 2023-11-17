@@ -206,10 +206,26 @@ const buscarHijos = async (req, res) => {
     }
 }
 
+const buscador = async (req, res) => {
+    try {
+        await date.execute('SELECT idBovino,areteBovino,nombre FROM Bovino');
+        return res.status(200).json({
+            message: 'Vacas obtenidas correctamente',
+            vacas: vacas[0],
+        });
+    } catch (error) {   
+        return res.status(500).json({
+            message: 'Hubo un error en el servidor',
+            error: error.message,
+        });
+    }
+}
+
 module.exports = {
     index,
     indexBorrados,
     buscarHijos,
+    buscador,
     getById,
     create,
     update,
