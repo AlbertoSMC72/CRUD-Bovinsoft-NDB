@@ -208,18 +208,27 @@ const buscarHijos = async (req, res) => {
 
 const buscador = async (req, res) => {
     try {
-        await date.execute('SELECT idBovino,areteBovino,nombre FROM Bovino WHERE deleted = 0 OR deleted IS NULL');
+        await date.execute('SELECT idBovino, areteBovino, nombre FROM Bovino WHERE deleted = 0 OR deleted IS NULL');
+        const vacas = vacas[0];
+
+        if (vacas.length === 0) {
+            return res.status(200).json({
+                message: 'No se encontraron vacas',
+                vacas: vacas,
+            });
+        }
+
         return res.status(200).json({
             message: 'Vacas obtenidas correctamente',
-            vacas: vacas[0],
+            vacas: vacas,
         });
     } catch (error) {   
         return res.status(500).json({
-            message: 'Hubo un error en el servidor',
+            message: 'Hubo un error en el servidor al buscar vacas',
             error: error.message,
         });
     }
-}
+};
 
 module.exports = {
     index,
