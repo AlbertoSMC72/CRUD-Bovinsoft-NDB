@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require('cors'); // Agrega esta línea
+const cors = require('cors');
 
 const bovinosRouter = require('./src/routes/bovinos.route');
 const estadosRouter = require ("./src/routes/estados.route");
