@@ -60,7 +60,7 @@ const getById = async (req, res) => {
         const [vaca] = await db.execute('SELECT * FROM Bovino WHERE idBovino = ?', [idBovino]);
 
         if (vaca.length === 0) {
-            return res.status(404).json({ message: 'bovino no encontrada' });
+            return res.status(404).json({ message: 'Bovino no encontrada' });
         }
 
         return res.status(200).json({
@@ -77,7 +77,7 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, deleted } = req.body;
+        const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, created_by, deleted } = req.body;
 
         // Obtener los idBovino correspondientes a los aretes de los padres
         const [idToroResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteToro]);
@@ -87,16 +87,16 @@ const create = async (req, res) => {
         const idVaca = idVacaResult[0] ? idVacaResult[0].idBovino : null;
 
         await db.execute(
-            'INSERT INTO bovino (siniiga, areteBovino, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, creadaAdministrador, deleted ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-            [siniiga || null, areteBovino || null, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, lugarMarca, creadaAdministrador, deleted]
+            'INSERT INTO Bovino (siniiga, areteBovino, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, lugarMarca, created_by, deleted ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            [siniiga || null, areteBovino || null, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, lugarMarca, created_by, deleted]
         );
 
         return res.status(201).json({
-            message: 'bovino creada exitosamente',
+            message: 'Bovino creada exitosamente',
         });
     } catch (error) {
         return res.status(500).json({
-            message: 'bovino un error en el servidor',
+            message: 'Bovino un error en el servidor',
             error: error.message,
         });
     }
@@ -118,7 +118,7 @@ const update = async (req, res) => {
         const idVaca = idVacaResult[0] ? idVacaResult[0].idBovino : null;
 
         await db.execute(
-            'UPDATE bovino SET siniiga = ?, fotoPerfil = ?, lugarMarca = ?, deleted = ?, areteBovino = ?, idToro = ?, idVaca = ?, pedigri = ? WHERE idBovino = ?',
+            'UPDATE Bovino SET siniiga = ?, fotoPerfil = ?, lugarMarca = ?, deleted = ?, areteBovino = ?, idToro = ?, idVaca = ?, pedigri = ? WHERE idBovino = ?',
             [siniiga || null, fotoPerfil || null, lugarMarca || null, deleted, areteBovino || null, idToro, idVaca, pedigri || null, idBovino]
         );
 
@@ -140,10 +140,10 @@ const deleteLogico = async (req, res) => {
     try {
         const fechaBorrado = new Date();
 
-        await db.execute('UPDATE bovino SET deleted = 1, deleted_at = ? WHERE idBovino = ?', [fechaBorrado, idBovino]);
+        await db.execute('UPDATE Bovino SET deleted = 1, deleted_at = ? WHERE idBovino = ?', [fechaBorrado, idBovino]);
 
         return res.status(200).json({
-            message: 'bovino eliminada correctamente (lógicamente)',
+            message: 'Bovino eliminada correctamente (lógicamente)',
         });
     } catch (error) {
         return res.status(500).json({
@@ -159,10 +159,10 @@ const deleteLogicoInverso = async (req, res) => {
     try {
         const fechaBorrado = new Date();
 
-        await db.execute('UPDATE bovino SET deleted = 0, deleted_at = ? WHERE idBovino = ?', [fechaBorrado, idBovino]);
+        await db.execute('UPDATE Bovino SET deleted = 0, deleted_at = ? WHERE idBovino = ?', [fechaBorrado, idBovino]);
 
         return res.status(200).json({
-            message: 'bovino restaurado correctamente ',
+            message: 'Bovino restaurado correctamente ',
         });
     } catch (error) {
         return res.status(500).json({
@@ -181,7 +181,7 @@ const deleteFisico = async (req, res) => {
         await db.execute('DELETE FROM Bovino WHERE idBovino = ?', [idBovino]);
 
         return res.status(200).json({
-            message: 'bovino eliminada correctamente (físicamente)',
+            message: 'Bovino eliminada correctamente (físicamente)',
         });
     } catch (error) {
         return res.status(500).json({
@@ -208,23 +208,22 @@ const buscarHijos = async (req, res) => {
 
 const buscador = async (req, res) => {
     try {
-        await date.execute('SELECT idBovino, areteBovino, nombre FROM Bovino WHERE deleted = 0 OR deleted IS NULL');
-        const vacas = vacas[0];
+        const [Bovinos] = await db.execute("SELECT idBovino, areteBovino, nombre FROM Bovino WHERE deleted = 0");
 
-        if (vacas.length === 0) {
+        if (Bovinos.length === 0) {
             return res.status(200).json({
-                message: 'No se encontraron vacas',
-                vacas: vacas,
+                message: 'No se encontraron Bovinos',
+                Bovinos: Bovinos,
             });
         }
 
         return res.status(200).json({
             message: 'Vacas obtenidas correctamente',
-            vacas: vacas,
+            Bovinos: Bovinos,
         });
     } catch (error) {   
         return res.status(500).json({
-            message: 'Hubo un error en el servidor al buscar vacas',
+            message: 'Hubo un error en el servidor al buscar Bovinos',
             error: error.message,
         });
     }
