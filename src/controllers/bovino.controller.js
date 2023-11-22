@@ -175,8 +175,6 @@ const deleteLogicoInverso = async (req, res) => {
     }
 };
 
-
-
 const deleteFisico = async (req, res) => {
     const idBovino = req.params.id;
 
@@ -232,12 +230,136 @@ const buscador = async (req, res) => {
     }
 };
 
+const toros = async (req, res) => {
+    try {
+        const [toros] = await db.execute(`
+            SELECT idBovino, areteBovino, nombre
+            FROM Bovino
+            WHERE genero = 'Macho' 
+            AND deleted = 0 
+            AND DATEDIFF(CURDATE(), fechaNacimiento) > 730
+        `);
+
+        if (toros.length === 0) {
+            return res.status(200).json({
+                message: 'No se encontraron toros',
+                toros: toros,
+            });
+        }
+
+        return res.status(200).json({
+            message: 'Toros obtenidos correctamente',
+            toros: toros,
+        });
+    } catch (error) {   
+        return res.status(500).json({
+            message: 'Hubo un error en el servidor al buscar toros',
+            error: error.message,
+        });
+    }
+};
+
+
+const vacas = async (req, res) => {
+    try {
+        const [vacas] = await db.execute(`
+            SELECT idBovino, areteBovino, nombre
+            FROM Bovino
+            WHERE genero = 'Hembra' 
+            AND deleted = 0 
+            AND DATEDIFF(CURDATE(), fechaNacimiento) > 730
+        `);
+
+        if (vacas.length === 0) {
+            return res.status(200).json({
+                message: 'No se encontraron vacas',
+                vacas: vacas,
+            });
+        }
+
+        return res.status(200).json({
+            message: 'Vacas obtenidas correctamente',
+            vacas: vacas,
+        });
+    } catch (error) {   
+        return res.status(500).json({
+            message: 'Hubo un error en el servidor al buscar vacas',
+            error: error.message,
+        });
+    }
+};
+
+
+const novillos = async (req, res) => {
+    try {
+        const [novillos] = await db.execute(`
+            SELECT idBovino, areteBovino, nombre
+            FROM Bovino
+            WHERE genero = 'Macho' 
+            AND deleted = 0 
+            AND DATEDIFF(CURDATE(), fechaNacimiento) < 730
+        `);
+
+        if (novillos.length === 0) {
+            return res.status(200).json({
+                message: 'No se encontraron novillos',
+                novillos: novillos,
+            });
+        }
+
+        return res.status(200).json({
+            message: 'Novillos obtenidos correctamente',
+            novillos: novillos,
+        });
+    } catch (error) {   
+        return res.status(500).json({
+            message: 'Hubo un error en el servidor al buscar novillos',
+            error: error.message,
+        });
+    }
+};
+
+
+const novillas = async (req, res) => {
+    try {
+        const [novillas] = await db.execute(`
+            SELECT idBovino, areteBovino, nombre
+            FROM Bovino
+            WHERE genero = 'Hembra' 
+            AND deleted = 0 
+            AND DATEDIFF(CURDATE(), fechaNacimiento) < 730
+        `);
+
+        if (novillas.length === 0) {
+            return res.status(200).json({
+                message: 'No se encontraron novillas',
+                novillas: novillas,
+            });
+        }
+
+        return res.status(200).json({
+            message: 'Novillas obtenidos correctamente',
+            novillas: novillas,
+        });
+    } catch (error) {   
+        return res.status(500).json({
+            message: 'Hubo un error en el servidor al buscar novillas',
+            error: error.message,
+        });
+    }
+};
+
+
 module.exports = {
     index,
     indexBorrados,
     buscarHijos,
     buscador,
     getById,
+    toros,
+    vacas,
+    novillos,
+    novillas,
     create,
     update,
     deleteLogico,
