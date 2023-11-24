@@ -166,7 +166,7 @@ const getByBovino = async (req, res) => {
   const idBovino = req.params.id;
 
   try {
-    const [eventos] = await db.execute('SELECT idEvento,idBovino,titulo,fecha_Reporte,descripcion,fecha_Reinsidio FROM Eventos WHERE idBovino = ? AND eventoTerminado = 0', [idBovino]);
+    const [eventos] = await db.execute('SELECT titulo,asunto,fecha_Reporte,descripcion,fecha_Reinsidio FROM Eventos WHERE idBovino = ? ', [idBovino]);
 
     if (eventos.length === 0) {
       return res.status(404).json({ message: 'Eventos no encontrados' });
