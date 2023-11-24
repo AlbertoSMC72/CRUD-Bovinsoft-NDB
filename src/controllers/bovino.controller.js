@@ -91,7 +91,7 @@ const create = async (req, res) => {
 
         await db.execute(
             'INSERT INTO Bovino (siniiga, areteBovino, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, tipoNacimiento, created_by ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-            [siniiga || null, areteBovino || null, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, tipoNacimiento, created_by]
+            [siniiga || null, areteBovino || "No definido", idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, tipoNacimiento, created_by]
         );
 
         return res.status(201).json({
@@ -194,7 +194,7 @@ const deleteFisico = async (req, res) => {
 
 const buscarPadres = async (req, res) => {
     try {
-        const idBovino  = req.params.id;
+        const idBovino  = req.params.i;
 
         const [result] = await db.execute(
             'SELECT b.idBovino, b.areteBovino, b.nombre, b.genero, b.fotoPerfil ' +
