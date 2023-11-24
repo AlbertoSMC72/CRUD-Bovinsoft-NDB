@@ -50,22 +50,27 @@ const getById = async (req, res) => {
 };
 
 
+
 const create = async (req, res) => {
   try {
-    const { idBovino, titulo, asunto, descripcion,created_by, fecha_Reinsidio } = req.body;
-    const fecha_Reporte = new Date();
+    const {
+      idBovino,
+      tituloEvento,
+      asunto,
+      descripcion,
+      fechaTerminar,
+      created_bySub,
+      fecha_Reporte,
+    } = req.body;
 
-    const asuntosPosibles = ['cargada', 'enferma', 'esperInseminar', 'nacimientoEsp', 'lecionada', 'fueraFinca', 'favorito', 'vendido', 'muerta'];
+    // Obtener el ID del administrador
+    const [created_byResult] = await db.execute('SELECT idAdministrador FROM Administradores WHERE correo = ? limit 1', [created_bySub]);
+    const created_by = created_byResult[0] ? created_byResult[0].idAdministrador : null;
 
-    if (!asuntosPosibles.includes(asunto)) {
-      console.log('No se actualiza el estado del bovino');
-    } else {
-      await actualizarEstado(idBovino, asunto);
-    }
-
+    // Insertar el evento en la base de datos
     await db.execute(
-      'INSERT INTO Eventos (idBovino, titulo, asunto, fecha_Reporte, descripcion,created_by, fecha_Reinsidio) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [idBovino, titulo, asunto || null, fecha_Reporte, descripcion || null,created_by, fecha_Reinsidio || null]
+      'INSERT INTO Eventos (idBovino, titulo, asunto, descripcion, fecha_Reinsidio, created_by, fecha_Reporte) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [idBovino, tituloEvento, asunto || null, descripcion || null, fechaTerminar || null, created_by, fecha_Reporte || null]
     );
 
     return res.status(201).json({
@@ -80,13 +85,6 @@ const create = async (req, res) => {
   }
 };
 
-async function actualizarEstado(idBovino, asunto) {
-  try {
-    await Estados.create(idBovino, asunto);
-  } catch (error) {
-    console.error('Error al actualizar estado:', error);
-  }
-}
 
 const update = async (req, res) => {
   const idEvento = req.params.id;

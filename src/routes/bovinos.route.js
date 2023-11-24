@@ -13,7 +13,8 @@ router.get('/novillas', authMiddleware.verificarJWT, bovinosController.novillas)
 router.get('/', authMiddleware.verificarJWT,  bovinosController.index);
 router.get('/borrados', authMiddleware.verificarJWT,  bovinosController.indexBorrados);
 router.get('/buscador', authMiddleware.verificarJWT,  bovinosController.buscador);
-router.get('/hijos' , authMiddleware.verificarJWT, bovinosController.buscarHijos);
+router.get('/hijos/:id' , authMiddleware.verificarJWT, bovinosController.buscarHijos);
+router.get('/padres/:id' , authMiddleware.verificarJWT, bovinosController.buscarPadres);
 router.get('/:id', authMiddleware.verificarJWT,  bovinosController.getById);
 router.post('/',  authMiddleware.verificarJWT, bovinosController.create);
 router.put('/:id', authMiddleware.verificarJWT, bovinosController.update);

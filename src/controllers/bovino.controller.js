@@ -35,7 +35,7 @@ const indexBorrados = async (req, res) => {
 
         if (page && limit) {
             vacas = await db.execute(
-                `SELECT * FROM Bovino WHERE deleted = 1 LIMIT ${skip},${limit} ` 
+                `SELECT * FROM Bovino WHERE deleted = 1 LIMIT ${skip},${limit} `
             );
         } else {
             vacas = await db.execute('SELECT * FROM Bovino WHERE deleted = 1 ');
@@ -192,20 +192,72 @@ const deleteFisico = async (req, res) => {
     }
 };
 
+const buscarPadres = async (req, res) => {
+    try {
+        const idBovino  = req.params.id;
+
+        const [result] = await db.execute(
+            'SELECT b.idBovino, b.areteBovino, b.nombre, b.genero, b.fotoPerfil ' +
+            'FROM Bovino AS bov ' +
+            'JOIN Bovino AS b ON bov.idToro = b.idBovino OR bov.idVaca = b.idBovino ' +
+            'WHERE bov.idBovino = ? AND (b.deleted = 0 OR b.deleted IS NULL)',
+            [idBovino]
+        );
+
+        const padres = {
+            padre: {},
+            madre: {}
+        };
+
+        result.forEach((row) => {
+            if (row.genero === 'Macho') {
+                padres.padre = {
+                    idBovino: row.idBovino,
+                    areteBovino: row.areteBovino,
+                    nombre: row.nombre,
+                    genero: row.genero,
+                    foto: row.fotoPerfil
+                };
+            } else if (row.genero === 'Hembra') {
+                padres.madre = {
+                    idBovino: row.idBovino,
+                    areteBovino: row.areteBovino,
+                    nombre: row.nombre,
+                    genero: row.genero,
+                    foto: row.fotoPerfil
+                };
+            }
+        });
+
+        return res.status(200).json({
+            message: 'Padres obtenidos correctamente',
+            padres: padres,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Hubo un error en el servidor',
+            error: error.message,
+        });
+    }
+};
+
+
 const buscarHijos = async (req, res) => {
     try {
-        await date.execute('SELECT idBovino,areteBovino,nombre FROM Bovino WHERE idToro = ? OR idVaca = ? and deleted = 0 OR deleted IS NULL', [idBovino, idBovino]);
+        const idBovino = req.params.id;
+        const Hijos = await db.execute('SELECT idBovino, areteBovino,nombre,fotoPerfil,genero FROM Bovino WHERE idToro = ? OR idVaca = ? AND (deleted = 0 OR deleted IS NULL)', [idBovino, idBovino]);
         return res.status(200).json({
-            message: 'Vacas obtenidas correctamente',
-            vacas: vacas[0],
+            message: 'Hijos obtenidas correctamente',
+            Hijos: Hijos[0],
         });
-    } catch (error) {   
+    } catch (error) {
         return res.status(500).json({
             message: 'Hubo un error en el servidor',
             error: error.message,
         });
     }
 }
+
 
 const buscador = async (req, res) => {
     try {
@@ -222,7 +274,7 @@ const buscador = async (req, res) => {
             message: 'Vacas obtenidas correctamente',
             Bovinos: Bovinos,
         });
-    } catch (error) {   
+    } catch (error) {
         return res.status(500).json({
             message: 'Hubo un error en el servidor al buscar Bovinos',
             error: error.message,
@@ -251,7 +303,7 @@ const toros = async (req, res) => {
             message: 'Toros obtenidos correctamente',
             toros: toros,
         });
-    } catch (error) {   
+    } catch (error) {
         return res.status(500).json({
             message: 'Hubo un error en el servidor al buscar toros',
             error: error.message,
@@ -281,7 +333,7 @@ const vacas = async (req, res) => {
             message: 'Vacas obtenidas correctamente',
             vacas: vacas,
         });
-    } catch (error) {   
+    } catch (error) {
         return res.status(500).json({
             message: 'Hubo un error en el servidor al buscar vacas',
             error: error.message,
@@ -311,7 +363,7 @@ const novillos = async (req, res) => {
             message: 'Novillos obtenidos correctamente',
             novillos: novillos,
         });
-    } catch (error) {   
+    } catch (error) {
         return res.status(500).json({
             message: 'Hubo un error en el servidor al buscar novillos',
             error: error.message,
@@ -341,7 +393,7 @@ const novillas = async (req, res) => {
             message: 'Novillas obtenidos correctamente',
             novillas: novillas,
         });
-    } catch (error) {   
+    } catch (error) {
         return res.status(500).json({
             message: 'Hubo un error en el servidor al buscar novillas',
             error: error.message,
@@ -354,6 +406,7 @@ module.exports = {
     index,
     indexBorrados,
     buscarHijos,
+    buscarPadres,
     buscador,
     getById,
     toros,
