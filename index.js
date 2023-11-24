@@ -8,13 +8,23 @@ const administradoresRouter = require('./src/routes/administradores.route');
 
 const app = express();
 
+const ALLOWED_ORIGIN = 'http://localhost:3000'; // Reemplaza con el dominio de tu aplicación React
+
 app.use(express.json());
 
-// Configura CORS
-app.use(cors());
+// Configura CORS con opciones específicas
+app.use(cors({
+  origin: ALLOWED_ORIGIN,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  exposedHeaders: 'Authorization', // Reemplaza con los encabezados que necesitas exponer
+}));
+
+// Manejo de solicitudes de preflight (OPTIONS)
+app.options('*', cors());
 
 app.use('/bovinos', bovinosRouter);
-app.use("/estados",estadosRouter);
+app.use("/estados", estadosRouter);
 app.use('/eventos', eventosRouter);
 app.use('/administradores', administradoresRouter);
 

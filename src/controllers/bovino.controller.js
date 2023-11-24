@@ -109,9 +109,8 @@ const create = async (req, res) => {
 const update = async (req, res) => {
     const idBovino = req.params.id;
     const datosActualizados = req.body;
-
     try {
-        const { siniiga, fotoPerfil, tipoNacimiento, deleted, areteBovino, areteToro, areteVaca, pedigri } = datosActualizados;
+        const { siniiga, fotoPerfil, areteBovino, areteToro, areteVaca, pedigri } = datosActualizados;
 
         // Obtener los idBovino correspondientes a los aretes de los padres
         const [idToroResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteToro]);
@@ -120,10 +119,29 @@ const update = async (req, res) => {
         const idToro = idToroResult[0] ? idToroResult[0].idBovino : null;
         const idVaca = idVacaResult[0] ? idVacaResult[0].idBovino : null;
 
-        await db.execute(
-            'UPDATE Bovino SET siniiga = ?, fotoPerfil = ?, tipoNacimiento = ?, deleted = ?, areteBovino = ?, idToro = ?, idVaca = ?, pedigri = ? WHERE idBovino = ?',
-            [siniiga || null, fotoPerfil || null, tipoNacimiento || null, deleted, areteBovino || null, idToro, idVaca, pedigri || null, idBovino]
-        );
+        const updated_at = new Date();
+
+        const updateQuery = 'UPDATE Bovino SET ' +
+            (siniiga ? 'siniiga = ?, ' : '') +
+            (fotoPerfil ? 'fotoPerfil = ?, ' : '') +
+            (areteBovino ? 'areteBovino = ?, ' : '') +
+            (idToro ? 'idToro = ?, ' : '') +
+            (idVaca ? 'idVaca = ?, ' : '') +
+            (pedigri ? 'pedigri = ?, ' : '') +
+            'updated_at = ? WHERE idBovino = ?';
+
+        const updateParams = [
+            ...(siniiga ? [siniiga] : []),
+            ...(fotoPerfil ? [fotoPerfil] : []),
+            ...(areteBovino ? [areteBovino] : []),
+            ...(idToro ? [idToro] : []),
+            ...(idVaca ? [idVaca] : []),
+            ...(pedigri ? [pedigri] : []),
+            updated_at,
+            idBovino
+        ];
+
+        await db.execute(updateQuery, updateParams);
 
         return res.status(200).json({
             message: 'Bovino actualizado correctamente',
