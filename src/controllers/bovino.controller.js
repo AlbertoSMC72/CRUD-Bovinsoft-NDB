@@ -194,7 +194,7 @@ const deleteFisico = async (req, res) => {
 
 const buscarPadres = async (req, res) => {
     try {
-        const idBovino  = req.params.i;
+        const idBovino  = req.params.id;
 
         const [result] = await db.execute(
             'SELECT b.idBovino, b.areteBovino, b.nombre, b.genero, b.fotoPerfil ' +
