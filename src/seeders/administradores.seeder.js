@@ -4,11 +4,11 @@ const saltosBcrypt = process.env.SALTOS_BCRYPT
 
 const administradores = [
     {
-        correo: 'admin1@example.com',
+        correo: 'admin3@example.com',
         password: 'contrasena1',
     },
     {
-        correo: 'admin2@example.com',
+        correo: 'admin4@example.com',
         password: 'contrasena2',
     },
 ];

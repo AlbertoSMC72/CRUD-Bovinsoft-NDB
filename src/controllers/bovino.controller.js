@@ -9,7 +9,7 @@ const index = async (req, res) => {
 
         if (page && limit) {
             vacas = await db.execute(
-                `SELECT *, IFNULL(arete, "No definidio") FROM Bovino WHERE deleted = 0 OR deleted IS NULL LIMIT ${skip},${limit} ` /* agregar order by */
+                `SELECT * FROM Bovino WHERE deleted = 0 OR deleted IS NULL LIMIT ${skip},${limit} ` /* agregar order by */
             );
         } else {
             vacas = await db.execute('SELECT * FROM Bovino WHERE deleted = 0 OR deleted IS NULL');

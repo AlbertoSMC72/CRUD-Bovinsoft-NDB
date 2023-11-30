@@ -1,42 +1,42 @@
 const db = require('../configs/db');
 
 const eventos = [
-  {
-      idBovino: 1,
-      tituloEvento: 'Evento 1 para Bovino 1',
-      asunto: 'Asunto del Evento 1',
-      descripcion: 'Descripción del Evento 1',
-      fechaTerminar: '2023-01-01',
-      created_bySub: 'admin1@example.com',
-      fecha_Reporte: '2023-01-02',
-  },
-  {
-      idBovino: 1,
-      tituloEvento: 'Evento 2 para Bovino 1',
-      asunto: 'Asunto del Evento 2',
-      descripcion: 'Descripción del Evento 2',
-      fechaTerminar: '2023-02-01',
-      created_bySub: 'admin2@example.com',
-      fecha_Reporte: '2023-02-02',
-  },
-  {
-      idBovino: 2,
-      tituloEvento: 'Evento 1 para Bovino 2',
-      asunto: 'Asunto del Evento 1',
-      descripcion: 'Descripción del Evento 1',
-      fechaTerminar: '2023-03-01',
-      created_bySub: 'admin3@example.com',
-      fecha_Reporte: '2023-03-02',
-  },
-  {
-      idBovino: 2,
-      tituloEvento: 'Evento 2 para Bovino 2',
-      asunto: 'Asunto del Evento 2',
-      descripcion: 'Descripción del Evento 2',
-      fechaTerminar: '2023-04-01',
-      created_bySub: 'admin4@example.com',
-      fecha_Reporte: '2023-04-02',
-  },
+    {
+        idBovino: 1,
+        tituloEvento: 'Evento 1 para Bovino 1',
+        asunto: 'Asunto del Evento 1',
+        descripcion: 'Descripción del Evento 1',
+        fechaTerminar: '2023-01-01',
+        created_bySub: 'admin1@example.com',
+        fecha_Reporte: '2023-01-02',
+    },
+    {
+        idBovino: 1,
+        tituloEvento: 'Evento 2 para Bovino 1',
+        asunto: 'Asunto del Evento 2',
+        descripcion: 'Descripción del Evento 2',
+        fechaTerminar: '2023-02-01',
+        created_bySub: 'admin2@example.com',
+        fecha_Reporte: '2023-02-02',
+    },
+    {
+        idBovino: 2,
+        tituloEvento: 'Evento 1 para Bovino 2',
+        asunto: 'Asunto del Evento 1',
+        descripcion: 'Descripción del Evento 1',
+        fechaTerminar: '2023-03-01',
+        created_bySub: 'admin3@example.com',
+        fecha_Reporte: '2023-03-02',
+    },
+    {
+        idBovino: 2,
+        tituloEvento: 'Evento 2 para Bovino 2',
+        asunto: 'Asunto del Evento 2',
+        descripcion: 'Descripción del Evento 2',
+        fechaTerminar: '2023-04-01',
+        created_bySub: 'admin4@example.com',
+        fecha_Reporte: '2023-04-02',
+    },
 ];
 
 const insertarEventos = async () => {
