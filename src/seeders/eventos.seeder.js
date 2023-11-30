@@ -1,50 +1,57 @@
-const db = require('mysql2/promise');
-
-require('dotenv').config();
+const db = require('../configs/db');
 
 const eventos = [
   {
-    idBovino: 1, 
-    titulo: 'Evento 1', 
-    asunto: 'Asunto 1', 
-    fecha_Reporte: '2023-11-10', 
-    descripcion: 'Descripción del evento 1',
-    fecha_Reinsidio: '2023-11-11', 
-  }
-
+      idBovino: 1,
+      tituloEvento: 'Evento 1 para Bovino 1',
+      asunto: 'Asunto del Evento 1',
+      descripcion: 'Descripción del Evento 1',
+      fechaTerminar: '2023-01-01',
+      created_bySub: 'admin1@example.com',
+      fecha_Reporte: '2023-01-02',
+  },
+  {
+      idBovino: 1,
+      tituloEvento: 'Evento 2 para Bovino 1',
+      asunto: 'Asunto del Evento 2',
+      descripcion: 'Descripción del Evento 2',
+      fechaTerminar: '2023-02-01',
+      created_bySub: 'admin2@example.com',
+      fecha_Reporte: '2023-02-02',
+  },
+  {
+      idBovino: 2,
+      tituloEvento: 'Evento 1 para Bovino 2',
+      asunto: 'Asunto del Evento 1',
+      descripcion: 'Descripción del Evento 1',
+      fechaTerminar: '2023-03-01',
+      created_bySub: 'admin3@example.com',
+      fecha_Reporte: '2023-03-02',
+  },
+  {
+      idBovino: 2,
+      tituloEvento: 'Evento 2 para Bovino 2',
+      asunto: 'Asunto del Evento 2',
+      descripcion: 'Descripción del Evento 2',
+      fechaTerminar: '2023-04-01',
+      created_bySub: 'admin4@example.com',
+      fecha_Reporte: '2023-04-02',
+  },
 ];
 
 const insertarEventos = async () => {
-  const connection = await db.createConnection({
-    host: process.env.HOST,
-    user: process.env.USER,
-    password: process.env.PASSWORD, 
-    database: process.env.DATABASE, 
-    port: process.env.PORT, 
-  });
+    const query = 'INSERT INTO Eventos (idBovino, titulo, asunto, descripcion, fecha_Reinsidio, created_by, fecha_Reporte) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
-  try {
     for (const evento of eventos) {
-      await connection.execute(
-        'INSERT INTO Eventos (idBovino, titulo, asunto, fecha_Reporte, descripcion, fecha_Reinsidio, eventoTerminado) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [
-          evento.idBovino,
-          evento.titulo,
-          evento.asunto,
-          evento.fecha_Reporte,
-          evento.descripcion,
-          evento.fecha_Reinsidio,
-          evento.eventoTerminado,
-        ]
-      );
+        const [created_byResult] = await db.execute('SELECT idAdministrador FROM Administradores WHERE correo = ? limit 1', [evento.created_bySub]);
+        const created_by = created_byResult[0] ? created_byResult[0].idAdministrador : null;
+        await db.execute(
+            query,
+            [evento.idBovino, evento.tituloEvento, evento.asunto || null, evento.descripcion || null, evento.fechaTerminar || null, created_by, evento.fecha_Reporte || null]
+        );
     }
 
-    console.log('Eventos insertados correctamente');
-  } catch (error) {
-    console.error('Error al insertar eventos:', error);
-  } finally {
-    connection.end(); 
-  }
+    console.log('Datos de eventos insertados correctamente');
 };
 
 insertarEventos();

@@ -1,30 +1,33 @@
-const db = require('./configs/db');
+const db = require('../configs/db');
+const bcrypt = require('bcrypt'); // Asegúrate de tener instalada esta biblioteca
+const saltosBcrypt = process.env.SALTOS_BCRYPT
 
 const administradores = [
-  {
-    usuario: "admin",
-    password: "password",
-  },
-  {
-    usuario: "Pepe",
-    password: "123",
-  },
-  {
-    usuario: "Angel",
-    password: "345",
-  },
-  {
-    usuario: "Norm",
-    password: "789",
-  },
+    {
+        correo: 'admin1@example.com',
+        password: 'contrasena1',
+    },
+    {
+        correo: 'admin2@example.com',
+        password: 'contrasena2',
+    },
 ];
 
-const insertarAdministradores = () => {
-  const query = 'insert into administradores (usuario, password) values (?,?)';
 
-  administradores.forEach((administrador) => {
-    db.execute(query, [administrador.usuario, administrador.password]);
-  });
+const insertarAdministradores = async () => {
+    const query = 'INSERT INTO Administradores (correo, password) VALUES (?, ?)';
+
+    for (const admin of administradores) {
+        const hashedPassword = bcrypt.hashSync(admin.password, parseInt(saltosBcrypt));
+        try {
+            await db.execute(query, [admin.correo, hashedPassword]);
+            console.log(`Administrador ${admin.correo} creado exitosamente`);
+        } catch (error) {
+            console.error(`Error al crear el administrador ${admin.correo}:`, error.message);
+        }
+    }
+
+    console.log('Datos de administradores insertados correctamente');
 };
 
 insertarAdministradores();
