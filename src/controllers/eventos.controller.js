@@ -183,6 +183,31 @@ const getByBovino = async (req, res) => {
     });
   }
 };
+const eventosSinTerminar = async (req, res) => {
+  try {
+    const [eventos] = await db.execute(`
+      SELECT E.idEvento as id, E.idBovino, E.titulo, E.asunto, E.fecha_Reporte, E.descripcion, E.fecha_Reinsidio, E.eventoTerminado, B.areteBovino , B.nombre
+      FROM Eventos E
+      JOIN Bovino B ON E.idBovino = B.idBovino
+      WHERE E.eventoTerminado = 0 AND E.deleted = 0
+    `);
+
+    if (eventos.length === 0) {
+      return res.status(404).json({ message: 'Eventos no encontrados' });
+    }
+
+    return res.status(200).json({
+      message: 'Eventos obtenidos correctamente',
+      eventos,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Hubo un error en el servidor al obtener los eventos',
+      error: error.message,
+    });
+  }
+};
+
 
 const muyImportante = async (req, res) => {
   try {
@@ -226,6 +251,7 @@ module.exports = {
   index,
   getById,
   getByBovino,
+  eventosSinTerminar,
   muyImportante,
   create,
   update,
