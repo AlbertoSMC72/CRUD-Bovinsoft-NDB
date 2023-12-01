@@ -77,7 +77,7 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, tipoNacimiento, adminCorreo } = req.body;
+        const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoBovino, pedigri, tipoNacimiento, adminCorreo } = req.body;
 
         // Obtener los idBovino correspondientes a los aretes de los padres
         const [idToroResult] = await db.execute('SELECT id_bovino FROM bovino WHERE arete_bovino = ?', [areteToro]);
@@ -91,7 +91,7 @@ const create = async (req, res) => {
 
         await db.execute(
             'INSERT INTO bovino (siniiga, arete_bovino, id_toro, id_vaca, nombre, raza, genero, fecha_nacimiento, foto_perfil, pedigri, tipo_nacimiento, created_by ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-            [siniiga || null, areteBovino || "No definido", idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, tipoNacimiento, created_by]
+            [siniiga || null, areteBovino || "No definido", idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoBovino || null, pedigri || null, tipoNacimiento, created_by]
         );
 
         return res.status(201).json({
@@ -305,7 +305,7 @@ const buscador = async (req, res) => {
 const toros = async (req, res) => {
     try {
         const [toros] = await db.execute(`
-            SELECT id_bovino, arete_bovino, nombre
+            SELECT id_bovino, arete_bovino, nombre,foto_perfil
             FROM bovino
             WHERE genero = 'Macho' 
             AND deleted = 0 
@@ -335,7 +335,7 @@ const toros = async (req, res) => {
 const vacas = async (req, res) => {
     try {
         const [vacas] = await db.execute(`
-            SELECT id_bovino, arete_bovino, nombre
+            SELECT id_bovino, arete_bovino, nombre,foto_perfil
             FROM bovino
             WHERE genero = 'Hembra' 
             AND deleted = 0 
@@ -365,7 +365,7 @@ const vacas = async (req, res) => {
 const novillos = async (req, res) => {
     try {
         const [novillos] = await db.execute(`
-            SELECT id_bovino, arete_bovino, nombre
+            SELECT id_bovino, arete_bovino, nombre, foto_perfil
             FROM bovino
             WHERE genero = 'Macho' 
             AND deleted = 0 
@@ -395,7 +395,7 @@ const novillos = async (req, res) => {
 const novillas = async (req, res) => {
     try {
         const [novillas] = await db.execute(`
-            SELECT id_bovino, arete_bovino, nombre
+            SELECT id_bovino, arete_bovino, nombre,foto_perfil
             FROM bovino
             WHERE genero = 'Hembra' 
             AND deleted = 0 
