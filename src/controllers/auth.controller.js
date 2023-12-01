@@ -9,7 +9,7 @@ const login = async (req, res) =>{
     try {
         const {correo, password} = req.body;
 
-        const usuarioEncontrado = await db.execute('select * from Administradores where correo = ?', [correo]);
+        const usuarioEncontrado = await db.execute('select * from administradores where correo = ?', [correo]);
         if (usuarioEncontrado[0].length == 0) {
             return res.status(400).json({
                 message: "correo o password incorrecto"

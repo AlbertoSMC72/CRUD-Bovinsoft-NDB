@@ -3,214 +3,214 @@ const db = require('../configs/db');
 const generaciones = [
     {
         siniiga: '123ABC',
-        areteBovino: 'A001',
-        areteToro: 'T001',
-        areteVaca: 'V001',
+        arete_bovino: 'A001',
+        arete_toro: 'T001',
+        arete_vaca: 'V001',
         nombre: 'Bovino1_G1',
         raza: 'Holstein',
         genero: 'Hembra',
-        fechaNacimiento: '2022-01-01',
-        fotoPerfil: 'url_imagen1.jpg',
+        fecha_nacimiento: '2022-01-01',
+        foto_perfil: 'url_imagen1.jpg',
         pedigri: 'Pedigree1',
-        tipoNacimiento: 'Natural',
+        tipo_nacimiento: 'Natural',
         idAdminResult: 'admin1@example.com',
     },
     {
         siniiga: '456DEF',
-        areteBovino: 'A002',
-        areteToro: 'T002',
-        areteVaca: 'V002',
+        arete_bovino: 'A002',
+        arete_toro: 'T002',
+        arete_vaca: 'V002',
         nombre: 'Bovino2_G1',
         raza: 'Angus',
         genero: 'Macho',
-        fechaNacimiento: '2022-02-01',
-        fotoPerfil: 'url_imagen2.jpg',
+        fecha_nacimiento: '2022-02-01',
+        foto_perfil: 'url_imagen2.jpg',
         pedigri: 'Pedigree2',
-        tipoNacimiento: 'Cesárea',
+        tipo_nacimiento: 'Cesárea',
         idAdminResult: 'admin2@example.com',
     },
     {
         siniiga: '789GHI',
-        areteBovino: 'A003',
-        areteToro: 'T003',
-        areteVaca: 'V003',
+        arete_bovino: 'A003',
+        arete_toro: 'T003',
+        arete_vaca: 'V003',
         nombre: 'Bovino3_G1',
         raza: 'Hereford',
         genero: 'Hembra',
-        fechaNacimiento: '2022-03-01',
-        fotoPerfil: 'url_imagen3.jpg',
+        fecha_nacimiento: '2022-03-01',
+        foto_perfil: 'url_imagen3.jpg',
         pedigri: 'Pedigree3',
-        tipoNacimiento: 'Natural',
+        tipo_nacimiento: 'Natural',
         idAdminResult: 'admin1@example.com',
     },
     {
         siniiga: '012JKL',
-        areteBovino: 'A004',
-        areteToro: 'T004',
-        areteVaca: 'V004',
+        arete_bovino: 'A004',
+        arete_toro: 'T004',
+        arete_vaca: 'V004',
         nombre: 'Bovino4_G1',
         raza: 'Simmental',
         genero: 'Macho',
-        fechaNacimiento: '2022-04-01',
-        fotoPerfil: 'url_imagen4.jpg',
+        fecha_nacimiento: '2022-04-01',
+        foto_perfil: 'url_imagen4.jpg',
         pedigri: 'Pedigree4',
-        tipoNacimiento: 'Cesárea',
+        tipo_nacimiento: 'Cesárea',
         idAdminResult: 'admin2@example.com',
     },
     {
         siniiga: '345MNO',
-        areteBovino: 'A005',
-        areteToro: 'T005',
-        areteVaca: 'V005',
+        arete_bovino: 'A005',
+        arete_toro: 'T005',
+        arete_vaca: 'V005',
         nombre: 'Bovino5_G1',
         raza: 'Limousin',
         genero: 'Hembra',
-        fechaNacimiento: '2022-05-01',
-        fotoPerfil: 'url_imagen5.jpg',
+        fecha_nacimiento: '2022-05-01',
+        foto_perfil: 'url_imagen5.jpg',
         pedigri: 'Pedigree5',
-        tipoNacimiento: 'Natural',
+        tipo_nacimiento: 'Natural',
         idAdminResult: 'admin1@example.com',
     },
     {
         siniiga: '678PQR',
-        areteBovino: 'A006',
-        areteToro: 'T001', // Padre de generación 1
-        areteVaca: 'V001', // Madre de generación 1
+        arete_bovino: 'A006',
+        arete_toro: 'T001', // Padre de generación 1
+        arete_vaca: 'V001', // Madre de generación 1
         nombre: 'Bovino1_G2',
         raza: 'Simmental',
         genero: 'Hembra',
-        fechaNacimiento: '2023-01-01',
-        fotoPerfil: 'url_imagen6.jpg',
+        fecha_nacimiento: '2023-01-01',
+        foto_perfil: 'url_imagen6.jpg',
         pedigri: 'Pedigree6',
-        tipoNacimiento: 'Natural',
+        tipo_nacimiento: 'Natural',
         idAdminResult: 'admin1@example.com',
     },
     {
         siniiga: '901STU',
-        areteBovino: 'A007',
-        areteToro: 'T002', // Padre de generación 1
-        areteVaca: 'V002', // Madre de generación 1
+        arete_bovino: 'A007',
+        arete_toro: 'T002', // Padre de generación 1
+        arete_vaca: 'V002', // Madre de generación 1
         nombre: 'Bovino2_G2',
         raza: 'Angus',
         genero: 'Macho',
-        fechaNacimiento: '2023-02-01',
-        fotoPerfil: 'url_imagen7.jpg',
+        fecha_nacimiento: '2023-02-01',
+        foto_perfil: 'url_imagen7.jpg',
         pedigri: 'Pedigree7',
-        tipoNacimiento: 'Cesárea',
+        tipo_nacimiento: 'Cesárea',
         idAdminResult: 'admin2@example.com',
     },
     {
         siniiga: '234VWX',
-        areteBovino: 'A008',
-        areteToro: 'T003', // Padre de generación 1
-        areteVaca: 'V003', // Madre de generación 1
+        arete_bovino: 'A008',
+        arete_toro: 'T003', // Padre de generación 1
+        arete_vaca: 'V003', // Madre de generación 1
         nombre: 'Bovino3_G2',
         raza: 'Hereford',
         genero: 'Hembra',
-        fechaNacimiento: '2023-03-01',
-        fotoPerfil: 'url_imagen8.jpg',
+        fecha_nacimiento: '2023-03-01',
+        foto_perfil: 'url_imagen8.jpg',
         pedigri: 'Pedigree8',
-        tipoNacimiento: 'Natural',
+        tipo_nacimiento: 'Natural',
         idAdminResult: 'admin2@example.com',
     },
     {
         siniiga: '567YZA',
-        areteBovino: 'A009',
-        areteToro: 'T004', // Padre de generación 1
-        areteVaca: 'V004', // Madre de generación 1
+        arete_bovino: 'A009',
+        arete_toro: 'T004', // Padre de generación 1
+        arete_vaca: 'V004', // Madre de generación 1
         nombre: 'Bovino4_G2',
         raza: 'Simmental',
         genero: 'Macho',
-        fechaNacimiento: '2023-04-01',
-        fotoPerfil: 'url_imagen9.jpg',
+        fecha_nacimiento: '2023-04-01',
+        foto_perfil: 'url_imagen9.jpg',
         pedigri: 'Pedigree9',
-        tipoNacimiento: 'Cesárea',
+        tipo_nacimiento: 'Cesárea',
         idAdminResult: 'admin1@example.com',
     },
     {
         siniiga: '890ABC',
-        areteBovino: 'A010',
-        areteToro: 'T005', // Padre de generación 1
-        areteVaca: 'V005', // Madre de generación 1
+        arete_bovino: 'A010',
+        arete_toro: 'T005', // Padre de generación 1
+        arete_vaca: 'V005', // Madre de generación 1
         nombre: 'Bovino5_G2',
         raza: 'Limousin',
         genero: 'Hembra',
-        fechaNacimiento: '2023-05-01',
-        fotoPerfil: 'url_imagen10.jpg',
+        fecha_nacimiento: '2023-05-01',
+        foto_perfil: 'url_imagen10.jpg',
         pedigri: 'Pedigree10',
-        tipoNacimiento: 'Natural',
+        tipo_nacimiento: 'Natural',
         idAdminResult: 'admin1@example.com',
     },
 
     // Generación 3
     {
         siniiga: '123BCD',
-        areteBovino: 'A011',
-        areteToro: 'T001', // Padre de generación 2
-        areteVaca: 'V001', // Madre de generación 2
+        arete_bovino: 'A011',
+        arete_toro: 'T001', // Padre de generación 2
+        arete_vaca: 'V001', // Madre de generación 2
         nombre: 'Bovino1_G3',
         raza: 'Angus',
         genero: 'Hembra',
-        fechaNacimiento: '2024-01-01',
-        fotoPerfil: 'url_imagen11.jpg',
+        fecha_nacimiento: '2024-01-01',
+        foto_perfil: 'url_imagen11.jpg',
         pedigri: 'Pedigree11',
-        tipoNacimiento: 'Natural',
+        tipo_nacimiento: 'Natural',
         idAdminResult: 'admin2@example.com',
     },
     {
         siniiga: '456CDE',
-        areteBovino: 'A012',
-        areteToro: 'T002', // Padre de generación 2
-        areteVaca: 'V002', // Madre de generación 2
+        arete_bovino: 'A012',
+        arete_toro: 'T002', // Padre de generación 2
+        arete_vaca: 'V002', // Madre de generación 2
         nombre: 'Bovino2_G3',
         raza: 'Hereford',
         genero: 'Macho',
-        fechaNacimiento: '2024-02-01',
-        fotoPerfil: 'url_imagen12.jpg',
+        fecha_nacimiento: '2024-02-01',
+        foto_perfil: 'url_imagen12.jpg',
         pedigri: 'Pedigree12',
-        tipoNacimiento: 'Cesárea',
+        tipo_nacimiento: 'Cesárea',
         idAdminResult: 'admin2@example.com',
     },
     {
         siniiga: '789DEF',
-        areteBovino: 'A013',
-        areteToro: 'T003', // Padre de generación 2
-        areteVaca: 'V003', // Madre de generación 2
+        arete_bovino: 'A013',
+        arete_toro: 'T003', // Padre de generación 2
+        arete_vaca: 'V003', // Madre de generación 2
         nombre: 'Bovino3_G3',
         raza: 'Simmental',
         genero: 'Hembra',
-        fechaNacimiento: '2024-03-01',
-        fotoPerfil: 'url_imagen13.jpg',
+        fecha_nacimiento: '2024-03-01',
+        foto_perfil: 'url_imagen13.jpg',
         pedigri: 'Pedigree13',
-        tipoNacimiento: 'Natural',
+        tipo_nacimiento: 'Natural',
         idAdminResult: 'admin2@example.com',
     },
     {
         siniiga: '012EFG',
-        areteBovino: 'A014',
-        areteToro: 'T004', // Padre de generación 2
-        areteVaca: 'V004', // Madre de generación 2
+        arete_bovino: 'A014',
+        arete_toro: 'T004', // Padre de generación 2
+        arete_vaca: 'V004', // Madre de generación 2
         nombre: 'Bovino4_G3',
         raza: 'Angus',
         genero: 'Macho',
-        fechaNacimiento: '2024-04-01',
-        fotoPerfil: 'url_imagen14.jpg',
+        fecha_nacimiento: '2024-04-01',
+        foto_perfil: 'url_imagen14.jpg',
         pedigri: 'Pedigree14',
-        tipoNacimiento: 'Cesárea',
+        tipo_nacimiento: 'Cesárea',
         idAdminResult: 'admin1@example.com',
     },
     {
         siniiga: '345GHI',
-        areteBovino: 'A015',
-        areteToro: 'T005', // Padre de generación 2
-        areteVaca: 'V005', // Madre de generación 2
+        arete_bovino: 'A015',
+        arete_toro: 'T005', // Padre de generación 2
+        arete_vaca: 'V005', // Madre de generación 2
         nombre: 'Bovino5_G3',
         raza: 'Limousin',
         genero: 'Hembra',
-        fechaNacimiento: '2024-05-01',
-        fotoPerfil: 'url_imagen15.jpg',
+        fecha_nacimiento: '2024-05-01',
+        foto_perfil: 'url_imagen15.jpg',
         pedigri: 'Pedigree15',
-        tipoNacimiento: 'Natural',
+        tipo_nacimiento: 'Natural',
         idAdminResult: 'admin2@example.com',
     },
 ];
@@ -218,19 +218,30 @@ const generaciones = [
 const insertarBovinos = async () => {
     try {
         for (const bovino of generaciones) {
-            const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, tipoNacimiento, idAdminResult } = bovino;
+            const { siniiga, arete_bovino, arete_toro, arete_vaca, nombre, raza, genero, fecha_nacimiento, foto_perfil, pedigri, tipo_nacimiento, idAdminResult } = bovino;
 
-            const [idToroResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteToro]);
-            const [idVacaResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteVaca]);
-            const [created_byResult] = await db.execute('SELECT idAdministrador FROM Administradores WHERE correo = ? limit 1', [idAdminResult]);
+        // Obtener los idBovino correspondientes a los aretes de los padres
+        const [idToroResult] = await db.execute('SELECT id_bovino FROM bovino WHERE arete_bovino = ?', [arete_toro]);
+        const [idVacaResult] = await db.execute('SELECT id_bovino FROM bovino WHERE arete_bovino = ?', [arete_vaca]);
+        const [created_byResult] = await db.execute('SELECT id_administrador FROM administradores WHERE correo = ? limit 1', [idAdminResult]);
 
-            const idToro = idToroResult[0] ? idToroResult[0].idBovino : null;
-            const idVaca = idVacaResult[0] ? idVacaResult[0].idBovino : null;
-            const created_by = created_byResult[0] ? created_byResult[0].idAdministrador : null;
+        console.log("idToro:", idToroResult);
+        console.log("idVaca:", idVacaResult);
+        console.log("created_by:", created_byResult);
+
+        // Manejar posibles valores nulos
+        const idToro = idToroResult && idToroResult[0] ? idToroResult[0].id_bovino : null;
+        const idVaca = idVacaResult && idVacaResult[0] ? idVacaResult[0].id_bovino : null;
+        const created_by = created_byResult && created_byResult[0] ? created_byResult[0].id_administrador : null;
+
+        // Verificar los resultados de las consultas
+/*         console.log("idToro:", idToro);
+        console.log("idVaca:", idVaca);
+        console.log("created_by:", created_by); */
 
             await db.execute(
-                'INSERT INTO Bovino (siniiga, areteBovino, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, tipoNacimiento, created_by ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-                [siniiga || null, areteBovino || "No definido", idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, tipoNacimiento, created_by]
+                'INSERT INTO bovino (siniiga, arete_bovino, id_toro, id_vaca, nombre, raza, genero, fecha_nacimiento, foto_perfil, pedigri, tipo_nacimiento, created_by ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+                [siniiga || null, arete_bovino || "No definido", idToro, idVaca, nombre, raza, genero, fecha_nacimiento, foto_perfil || null, pedigri || null, tipo_nacimiento, created_by ]
             );
 
             console.log(`Bovino ${nombre} creado exitosamente`);

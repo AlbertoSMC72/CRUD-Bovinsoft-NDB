@@ -11,13 +11,13 @@ const index = async (req, res) => {
         let administradores;
 
         if (page && limit) {
-            administradores = await db.execute(`SELECT * FROM Administradores LIMIT ${skip},${limit}`);
+            administradores = await db.execute(`SELECT * FROM administradores LIMIT ${skip},${limit}`);
         } else {
-            administradores = await db.execute('SELECT * FROM Administradores');
+            administradores = await db.execute('SELECT * FROM administradores');
         }
 
         return res.status(200).json({
-            message: 'Administradores obtenidos correctamente',
+            message: 'administradores obtenidos correctamente',
             administradores: administradores[0],
         });
     } catch (error) {
@@ -55,7 +55,7 @@ const create = async (req, res) => {
         const correo = req.body.correo
 
         try {
-            await db.execute('INSERT INTO Administradores (correo, password) VALUES (?, ?)', [correo, password]);
+            await db.execute('INSERT INTO administradores (correo, password) VALUES (?, ?)', [correo, password]);
 
             return res.status(201).json({
                 message: 'Administrador creado exitosamente',
@@ -81,7 +81,7 @@ const update = async (req, res) => {
         const hoy = new Date();
 
         try {
-            await db.execute('UPDATE Administradores SET correo = ?, password = ?, updated_at = ? WHERE idAdministrador = ?',
+            await db.execute('UPDATE administradores SET correo = ?, password = ?, updated_at = ? WHERE id_administrador = ?',
                 [correo, password, hoy, adminId]);
 
             return res.status(200).json({
@@ -107,7 +107,7 @@ const deleteFisico = async (req, res) => {
         const adminId = req.params.id;
 
         try {
-            await db.execute('DELETE FROM Administradores WHERE idAdministrador = ?', [adminId]);
+            await db.execute('DELETE FROM administradores WHERE id_administrador = ?', [adminId]);
 
             return res.status(200).json({
                 message: 'Administrador eliminado (físicamente) correctamente',

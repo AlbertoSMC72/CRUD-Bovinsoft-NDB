@@ -9,10 +9,10 @@ const index = async (req, res) => {
 
         if (page && limit) {
             vacas = await db.execute(
-                `SELECT * FROM Bovino WHERE deleted = 0 OR deleted IS NULL LIMIT ${skip},${limit} ` /* agregar order by */
+                `SELECT * FROM bovino WHERE deleted = 0 OR deleted IS NULL LIMIT ${skip},${limit} `
             );
         } else {
-            vacas = await db.execute('SELECT * FROM Bovino WHERE deleted = 0 OR deleted IS NULL');
+            vacas = await db.execute('SELECT * FROM bovino WHERE deleted = 0 OR deleted IS NULL');
         }
 
         return res.status(200).json({
@@ -35,10 +35,10 @@ const indexBorrados = async (req, res) => {
 
         if (page && limit) {
             vacas = await db.execute(
-                `SELECT * FROM Bovino WHERE deleted = 1 LIMIT ${skip},${limit} `
+                `SELECT * FROM bovino WHERE deleted = 1 LIMIT ${skip},${limit} `
             );
         } else {
-            vacas = await db.execute('SELECT * FROM Bovino WHERE deleted = 1 ');
+            vacas = await db.execute('SELECT * FROM bovino WHERE deleted = 1 ');
         }
 
         return res.status(200).json({
@@ -57,10 +57,10 @@ const getById = async (req, res) => {
     const idBovino = req.params.id;
 
     try {
-        const [vaca] = await db.execute('SELECT * FROM Bovino WHERE idBovino = ?', [idBovino]);
+        const [vaca] = await db.execute('SELECT * FROM bovino WHERE id_bovino = ?', [idBovino]);
 
         if (vaca.length === 0) {
-            return res.status(404).json({ message: 'Bovino no encontrada' });
+            return res.status(404).json({ message: 'bovino no encontrada' });
         }
 
         return res.status(200).json({
@@ -77,33 +77,35 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, tipoNacimiento, idAdminResult } = req.body;
+        const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, tipoNacimiento, adminCorreo } = req.body;
 
         // Obtener los idBovino correspondientes a los aretes de los padres
-        const [idToroResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteToro]);
-        const [idVacaResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteVaca]);
-        const [created_byResult] = await db.execute('SELECT idAdministrador FROM Administradores WHERE correo = ? limit 1', [idAdminResult]);
+        const [idToroResult] = await db.execute('SELECT id_bovino FROM bovino WHERE arete_bovino = ?', [areteToro]);
+        const [idVacaResult] = await db.execute('SELECT id_bovino FROM bovino WHERE arete_bovino = ?', [areteVaca]);
+        const [created_byResult] = await db.execute('SELECT id_administrador FROM administradores WHERE correo = ? limit 1', [adminCorreo]);
 
-        const idToro = idToroResult[0] ? idToroResult[0].idBovino : null;
-        const idVaca = idVacaResult[0] ? idVacaResult[0].idBovino : null;
-        const created_by = created_byResult[0] ? created_byResult[0].idAdministrador : null;
-
+        // Manejar posibles valores nulos
+        const idToro = idToroResult && idToroResult[0] ? idToroResult[0].id_bovino : null;
+        const idVaca = idVacaResult && idVacaResult[0] ? idVacaResult[0].id_bovino : null;
+        const created_by = created_byResult && created_byResult[0] ? created_byResult[0].id_administrador : null;
 
         await db.execute(
-            'INSERT INTO Bovino (siniiga, areteBovino, idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil, pedigri, tipoNacimiento, created_by ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+            'INSERT INTO bovino (siniiga, arete_bovino, id_toro, id_vaca, nombre, raza, genero, fecha_nacimiento, foto_perfil, pedigri, tipo_nacimiento, created_by ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
             [siniiga || null, areteBovino || "No definido", idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoPerfil || null, pedigri || null, tipoNacimiento, created_by]
         );
 
         return res.status(201).json({
-            message: 'Bovino creada exitosamente',
+            message: 'bovino creada exitosamente',
         });
     } catch (error) {
+        console.error("Error al crear bovino:", error.message);
         return res.status(500).json({
-            message: 'Bovino un error en el servidor',
+            message: 'bovino un error en el servidor',
             error: error.message,
         });
     }
 };
+
 
 
 const update = async (req, res) => {
@@ -113,22 +115,22 @@ const update = async (req, res) => {
         const { siniiga, fotoPerfil, areteBovino, areteToro, areteVaca, pedigri } = datosActualizados;
 
         // Obtener los idBovino correspondientes a los aretes de los padres
-        const [idToroResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteToro]);
-        const [idVacaResult] = await db.execute('SELECT idBovino FROM Bovino WHERE areteBovino = ?', [areteVaca]);
+        const [idToroResult] = await db.execute('SELECT id_bovino FROM bovino WHERE arete_bovino = ?', [areteToro]);
+        const [idVacaResult] = await db.execute('SELECT id_bovino FROM bovino WHERE arete_bovino = ?', [areteVaca]);
 
         const idToro = idToroResult[0] ? idToroResult[0].idBovino : null;
         const idVaca = idVacaResult[0] ? idVacaResult[0].idBovino : null;
 
         const updated_at = new Date();
 
-        const updateQuery = 'UPDATE Bovino SET ' +
+        const updateQuery = 'UPDATE bovino SET ' +
             (siniiga ? 'siniiga = ?, ' : '') +
-            (fotoPerfil ? 'fotoPerfil = ?, ' : '') +
-            (areteBovino ? 'areteBovino = ?, ' : '') +
-            (idToro ? 'idToro = ?, ' : '') +
-            (idVaca ? 'idVaca = ?, ' : '') +
+            (fotoPerfil ? 'foto_perfil = ?, ' : '') +
+            (areteBovino ? 'arete_bovino = ?, ' : '') +
+            (idToro ? 'id_toro = ?, ' : '') +
+            (idVaca ? 'id_vaca = ?, ' : '') +
             (pedigri ? 'pedigri = ?, ' : '') +
-            'updated_at = ? WHERE idBovino = ?';
+            'updated_at = ? WHERE id_bovino = ?';
 
         const updateParams = [
             ...(siniiga ? [siniiga] : []),
@@ -144,7 +146,7 @@ const update = async (req, res) => {
         await db.execute(updateQuery, updateParams);
 
         return res.status(200).json({
-            message: 'Bovino actualizado correctamente',
+            message: 'bovino actualizado correctamente',
         });
     } catch (error) {
         return res.status(500).json({
@@ -161,10 +163,10 @@ const deleteLogico = async (req, res) => {
     try {
         const fechaBorrado = new Date();
 
-        await db.execute('UPDATE Bovino SET deleted = 1, deleted_at = ? WHERE idBovino = ?', [fechaBorrado, idBovino]);
+        await db.execute('UPDATE bhovino SET deleted = 1, deleted_at = ? WHERE id_bovino = ?', [fechaBorrado, idBovino]);
 
         return res.status(200).json({
-            message: 'Bovino eliminada correctamente (lógicamente)',
+            message: 'bovino eliminada correctamente (lógicamente)',
         });
     } catch (error) {
         return res.status(500).json({
@@ -180,10 +182,10 @@ const deleteLogicoInverso = async (req, res) => {
     try {
         const fechaBorrado = new Date();
 
-        await db.execute('UPDATE Bovino SET deleted = 0, deleted_at = ? WHERE idBovino = ?', [fechaBorrado, idBovino]);
+        await db.execute('UPDATE bovino SET deleted = 0, deleted_at = ? WHERE id_bovino = ?', [fechaBorrado, idBovino]);
 
         return res.status(200).json({
-            message: 'Bovino restaurado correctamente ',
+            message: 'bovino restaurado correctamente ',
         });
     } catch (error) {
         return res.status(500).json({
@@ -197,10 +199,10 @@ const deleteFisico = async (req, res) => {
     const idBovino = req.params.id;
 
     try {
-        await db.execute('DELETE FROM Bovino WHERE idBovino = ?', [idBovino]);
+        await db.execute('DELETE FROM bovino WHERE id_bovino = ?', [idBovino]);
 
         return res.status(200).json({
-            message: 'Bovino eliminada correctamente (físicamente)',
+            message: 'bovino eliminada correctamente (físicamente)',
         });
     } catch (error) {
         return res.status(500).json({
@@ -212,13 +214,13 @@ const deleteFisico = async (req, res) => {
 
 const buscarPadres = async (req, res) => {
     try {
-        const idBovino  = req.params.id;
+        const idBovino = req.params.id;
 
         const [result] = await db.execute(
-            'SELECT b.idBovino, b.areteBovino, b.nombre, b.genero, b.fotoPerfil ' +
-            'FROM Bovino AS bov ' +
-            'JOIN Bovino AS b ON bov.idToro = b.idBovino OR bov.idVaca = b.idBovino ' +
-            'WHERE bov.idBovino = ? AND (b.deleted = 0 OR b.deleted IS NULL)',
+            'SELECT b.id_bovino, b.arete_bovino, b.nombre, b.genero, b.foto_perfil ' +
+            'FROM bovino AS bov ' +
+            'JOIN bovino AS b ON bov.id_toro = b.id_bovino OR bov.id_vaca = b.id_bovino ' +
+            'WHERE bov.id_bovino = ? AND (b.deleted = 0 OR b.deleted IS NULL)',
             [idBovino]
         );
 
@@ -263,7 +265,7 @@ const buscarPadres = async (req, res) => {
 const buscarHijos = async (req, res) => {
     try {
         const idBovino = req.params.id;
-        const Hijos = await db.execute('SELECT idBovino, areteBovino,nombre,fotoPerfil,genero FROM Bovino WHERE idToro = ? OR idVaca = ? AND (deleted = 0 OR deleted IS NULL)', [idBovino, idBovino]);
+        const Hijos = await db.execute('SELECT id_bovino, arete_bovino,nombre,foto_perfil,genero FROM bovino WHERE id_toro = ? OR id_vaca = ? AND (deleted = 0 OR deleted IS NULL)', [idBovino, idBovino]);
         return res.status(200).json({
             message: 'Hijos obtenidas correctamente',
             Hijos: Hijos[0],
@@ -279,7 +281,7 @@ const buscarHijos = async (req, res) => {
 
 const buscador = async (req, res) => {
     try {
-        const [Bovinos] = await db.execute("SELECT idBovino, areteBovino, nombre FROM Bovino WHERE deleted = 0");
+        const [Bovinos] = await db.execute("SELECT id_bovino, arete_bovino, nombre FROM bovino WHERE deleted = 0");
 
         if (Bovinos.length === 0) {
             return res.status(200).json({
@@ -303,11 +305,11 @@ const buscador = async (req, res) => {
 const toros = async (req, res) => {
     try {
         const [toros] = await db.execute(`
-            SELECT idBovino, areteBovino, nombre
-            FROM Bovino
+            SELECT id_bovino, arete_bovino, nombre
+            FROM bovino
             WHERE genero = 'Macho' 
             AND deleted = 0 
-            AND DATEDIFF(CURDATE(), fechaNacimiento) > 730
+            AND DATEDIFF(CURDATE(), fecha_nacimiento) > 730
         `);
 
         if (toros.length === 0) {
@@ -333,8 +335,8 @@ const toros = async (req, res) => {
 const vacas = async (req, res) => {
     try {
         const [vacas] = await db.execute(`
-            SELECT idBovino, areteBovino, nombre
-            FROM Bovino
+            SELECT id_bovino, arete_bovino, nombre
+            FROM bovino
             WHERE genero = 'Hembra' 
             AND deleted = 0 
             AND DATEDIFF(CURDATE(), fechaNacimiento) > 730
@@ -363,11 +365,11 @@ const vacas = async (req, res) => {
 const novillos = async (req, res) => {
     try {
         const [novillos] = await db.execute(`
-            SELECT idBovino, areteBovino, nombre
-            FROM Bovino
+            SELECT id_bovino, arete_bovino, nombre
+            FROM bovino
             WHERE genero = 'Macho' 
             AND deleted = 0 
-            AND DATEDIFF(CURDATE(), fechaNacimiento) < 730
+            AND DATEDIFF(CURDATE(), fecha_nacimiento) < 730
         `);
 
         if (novillos.length === 0) {
@@ -393,11 +395,11 @@ const novillos = async (req, res) => {
 const novillas = async (req, res) => {
     try {
         const [novillas] = await db.execute(`
-            SELECT idBovino, areteBovino, nombre
-            FROM Bovino
+            SELECT id_bovino, arete_bovino, nombre
+            FROM bovino
             WHERE genero = 'Hembra' 
             AND deleted = 0 
-            AND DATEDIFF(CURDATE(), fechaNacimiento) < 730
+            AND DATEDIFF(CURDATE(), fecha_nacimiento) < 730
         `);
 
         if (novillas.length === 0) {

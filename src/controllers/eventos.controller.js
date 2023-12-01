@@ -9,10 +9,10 @@ const index = async (req, res) => {
 
     if (page && limit) {
       eventos = await db.execute(
-        `SELECT * FROM Eventos WHERE eventoTerminado = 0 LIMIT ${skip},${limit}`
+        `SELECT * FROM Eventos WHERE evento_terminado = 0 LIMIT ${skip},${limit}`
       );
     } else {
-      eventos = await db.execute('SELECT * FROM Eventos WHERE eventoTerminado = 0');
+      eventos = await db.execute('SELECT * FROM Eventos WHERE evento_terminado = 0');
     }
 
     return res.status(200).json({
@@ -31,7 +31,7 @@ const getById = async (req, res) => {
   const idEvento = req.params.id;
 
   try {
-    const [evento] = await db.execute('SELECT * FROM Eventos WHERE idEvento = ? AND eventoTerminado = 0', [idEvento]);
+    const [evento] = await db.execute('SELECT * FROM Eventos WHERE id_evento = ? AND evento_terminado = 0', [idEvento]);
 
     if (evento.length === 0) {
       return res.status(404).json({ message: 'Evento no encontrado' });
@@ -64,12 +64,12 @@ const create = async (req, res) => {
     } = req.body;
 
     // Obtener el ID del administrador
-    const [created_byResult] = await db.execute('SELECT idAdministrador FROM Administradores WHERE correo = ? limit 1', [created_bySub]);
+    const [created_byResult] = await db.execute('SELECT id_administrador FROM Administradores WHERE correo = ? limit 1', [created_bySub]);
     const created_by = created_byResult[0] ? created_byResult[0].idAdministrador : null;
 
     // Insertar el evento en la base de datos
     await db.execute(
-      'INSERT INTO Eventos (idBovino, titulo, asunto, descripcion, fecha_Reinsidio, created_by, fecha_Reporte) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO Eventos (id_bovino, titulo, asunto, descripcion, fecha_reinsidio, created_by, fecha_reporte) VALUES (?, ?, ?, ?, ?, ?, ?)',
       [idBovino, tituloEvento, asunto || null, descripcion || null, fechaTerminar || null, created_by, fecha_Reporte || null]
     );
 
@@ -92,7 +92,7 @@ const update = async (req, res) => {
   const hoy = new Date();
   try {
     await db.execute(
-      'UPDATE Eventos SET titulo = ?, asunto = ?, descripcion = ?, fecha_Reinsidio = ?, updated_at = ? WHERE idEvento = ?',
+      'UPDATE Eventos SET titulo = ?, asunto = ?, descripcion = ?, fecha_reinsidio = ?, updated_at = ? WHERE id_evento = ?',
       [titulo, asunto || null, descripcion || null, fecha_Reinsidio || null, hoy, idEvento]
     );
 
@@ -114,7 +114,7 @@ const deleteLogico = async (req, res) => {
   const hoy = new Date();
 
   try {
-    await db.execute('UPDATE Eventos SET deleted = 1, deleted_at = ? WHERE idEvento = ?', [hoy, idEvento]);
+    await db.execute('UPDATE Eventos SET deleted = 1, deleted_at = ? WHERE id_evento = ?', [hoy, idEvento]);
 
     return res.status(200).json({
       message: 'Evento eliminado (lógicamente) correctamente',
@@ -132,7 +132,7 @@ const eventoTerminado = async (req, res) => {
   const hoy = new Date();
 
   try {
-    await db.execute('UPDATE Eventos SET eventoTerminado = 1, updated_at = ? WHERE idEvento = ?', [hoy, idEvento]);
+    await db.execute('UPDATE Eventos SET evento_terminado = 1, updated_at = ? WHERE id_evento = ?', [hoy, idEvento]);
 
     return res.status(200).json({
       message: 'Evento eliminado (lógicamente) correctamente',
@@ -149,7 +149,7 @@ const deleteFisico = async (req, res) => {
   const idEvento = req.params.id;
 
   try {
-    await db.execute('DELETE FROM Eventos WHERE idEvento = ?', [idEvento]);
+    await db.execute('DELETE FROM Eventos WHERE id_evento = ?', [idEvento]);
 
     return res.status(200).json({
       message: 'Evento eliminado (físicamente) correctamente',
@@ -166,7 +166,7 @@ const getByBovino = async (req, res) => {
   const idBovino = req.params.id;
 
   try {
-    const [eventos] = await db.execute('SELECT titulo,asunto,fecha_Reporte,descripcion,fecha_Reinsidio FROM Eventos WHERE idBovino = ? ', [idBovino]);
+    const [eventos] = await db.execute('SELECT titulo,asunto,fecha_reporte,descripcion,fecha_reinsidio FROM Eventos WHERE id_bovino = ? ', [idBovino]);
 
     if (eventos.length === 0) {
       return res.status(404).json({ message: 'Eventos no encontrados' });
@@ -186,10 +186,10 @@ const getByBovino = async (req, res) => {
 const eventosSinTerminar = async (req, res) => {
   try {
     const [eventos] = await db.execute(`
-      SELECT E.idEvento as id, E.idBovino, E.titulo, E.asunto, E.fecha_Reporte, E.descripcion, E.fecha_Reinsidio, E.eventoTerminado, B.areteBovino , B.nombre
+      SELECT E.id_evento as id, E.id_bovino, E.titulo, E.asunto, E.fecha_reporte, E.descripcion, E.fecha_reinsidio, E.evento_terminado, B.arete_bovino , B.nombre
       FROM Eventos E
-      JOIN Bovino B ON E.idBovino = B.idBovino
-      WHERE E.eventoTerminado = 0 AND E.deleted = 0
+      JOIN Bovino B ON E.id_bovino = B.id_bovino
+      WHERE E.evento_terminado = 0 AND E.deleted = 0
     `);
 
     if (eventos.length === 0) {
@@ -213,20 +213,20 @@ const muyImportante = async (req, res) => {
   try {
     const [eventos] = await db.execute(`
       SELECT 
-        e.idEvento,
+        e.id_evento,
         e.titulo,
         e.asunto,
-        e.fecha_Reporte,
+        e.fecha_reporte,
         e.descripcion,
-        e.fecha_Reinsidio,
+        e.fecha_reinsidio,
         b.nombre as nombreBovino,
-        b.areteBovino
+        b.arete_bovino
       FROM Eventos e
-      JOIN Bovino b ON e.idBovino = b.idBovino
+      JOIN Bovino b ON e.id_bovino = b.id_bovino
       WHERE 
-        e.eventoTerminado = 0
+        e.evento_terminado = 0
         AND e.deleted = 0
-        AND DATEDIFF(CURDATE(), e.fecha_Reinsidio) <= 5
+        AND DATEDIFF(CURDATE(), e.fecha_reinsidio) <= 5
     `);
 
     if (eventos.length === 0) {

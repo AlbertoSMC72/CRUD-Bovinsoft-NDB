@@ -3,7 +3,7 @@ const db = require('../configs/db');
 
 const index = async (req, res) => {
   try {
-    const estados = await db.execute('SELECT * FROM Estado');
+    const estados = await db.execute('SELECT * FROM estado');
     return res.status(200).json({
       message: 'Estados obtenidos correctamente',
       estados: estados[0],
@@ -20,14 +20,14 @@ const getById = async (req, res) => {
   const idEstado = req.params.id;
 
   try {
-    const [estado] = await db.execute('SELECT * FROM Estado WHERE idEstado = ?', [idEstado]);
+    const [estado] = await db.execute('SELECT * FROM estado WHERE id_estado = ?', [idEstado]);
 
     if (estado.length === 0) {
-      return res.status(404).json({ message: 'Estado no encontrado' });
+      return res.status(404).json({ message: 'estado no encontrado' });
     }
 
     return res.status(200).json({
-      message: 'Estado obtenido correctamente',
+      message: 'estado obtenido correctamente',
       estado: estado[0],
     });
   } catch (error) {
@@ -43,7 +43,7 @@ const create = async (req, res) => {
     const { idBovino, estado } = req.body;
 
     // Verificar si ya existe un evento para la vaca con el mismo estado
-    const existingEvent = await db.execute('SELECT idEstado FROM Estado WHERE idBovino = ? AND estado = ?', [idBovino, estado]);
+    const existingEvent = await db.execute('SELECT id_estado FROM estado WHERE id_bovino = ? AND estado = ?', [idBovino, estado]);
 
     if (existingEvent && existingEvent.length > 0) {
       return res.status(400).json({
@@ -52,10 +52,10 @@ const create = async (req, res) => {
     }
 
     // Si no existe, crear el nuevo evento
-    await db.execute('INSERT INTO Estado (idBovino, estado) VALUES (?, ?)', [idBovino, estado]);
+    await db.execute('INSERT INTO estado (id_bovino, estado) VALUES (?, ?)', [idBovino, estado]);
 
     return res.status(201).json({
-      message: 'Estado creado exitosamente',
+      message: 'estado creado exitosamente',
     });
   } catch (error) {
     return res.status(500).json({
@@ -73,10 +73,10 @@ const update = async (req, res) => {
 
     const { idBovino, estado } = datosActualizados;
 
-    await db.execute('UPDATE Estado SET idBovino = ?, estado = ? WHERE idEstado = ?', [idBovino, estado, idEstado]);
+    await db.execute('UPDATE estado SET id_bovino = ?, estado = ? WHERE id_estado = ?', [idBovino, estado, idEstado]);
 
     return res.status(200).json({
-      message: 'Estado actualizado correctamente',
+      message: 'estado actualizado correctamente',
     });
   } catch (error) {
     return res.status(500).json({
@@ -90,10 +90,10 @@ const deleteLogico = async (req, res) => {
   const idEstado = req.params.id;
 
   try {
-    await db.execute('UPDATE Estado SET deleted = true WHERE idEstado = ?', [idEstado]);
+    await db.execute('UPDATE estado SET deleted = true WHERE id_estado = ?', [idEstado]);
 
     return res.status(200).json({
-      message: 'Estado eliminado correctamente (lógicamente)',
+      message: 'estado eliminado correctamente (lógicamente)',
     });
   } catch (error) {
     return res.status(500).json({
@@ -107,10 +107,10 @@ const deleteFisico = async (req, res) => {
   const idEstado = req.params.id;
 
   try {
-    await db.execute('DELETE FROM Estado WHERE idEstado = ?', [idEstado]);
+    await db.execute('DELETE FROM estado WHERE id_estado = ?', [idEstado]);
 
     return res.status(200).json({
-      message: 'Estado eliminado correctamente (físicamente)',
+      message: 'estado eliminado correctamente (físicamente)',
     });
   } catch (error) {
     return res.status(500).json({
