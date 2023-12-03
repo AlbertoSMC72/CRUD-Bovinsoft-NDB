@@ -339,7 +339,7 @@ const vacas = async (req, res) => {
             FROM bovino
             WHERE genero = 'Hembra' 
             AND deleted = 0 
-            AND DATEDIFF(CURDATE(), fechaNacimiento) > 730
+            AND DATEDIFF(CURDATE(), fecha_nacimiento) > 730
         `);
 
         if (vacas.length === 0) {

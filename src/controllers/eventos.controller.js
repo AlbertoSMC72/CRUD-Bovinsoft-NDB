@@ -9,14 +9,14 @@ const index = async (req, res) => {
 
     if (page && limit) {
       eventos = await db.execute(
-        `SELECT * FROM Eventos WHERE evento_terminado = 0 LIMIT ${skip},${limit}`
+        `SELECT * FROM eventos WHERE evento_terminado = 0 LIMIT ${skip},${limit}`
       );
     } else {
-      eventos = await db.execute('SELECT * FROM Eventos WHERE evento_terminado = 0');
+      eventos = await db.execute('SELECT * FROM eventos WHERE evento_terminado = 0');
     }
 
     return res.status(200).json({
-      message: 'Eventos obtenidos correctamente',
+      message: 'eventos obtenidos correctamente',
       eventos: eventos[0],
     });
   } catch (error) {
@@ -31,7 +31,7 @@ const getById = async (req, res) => {
   const idEvento = req.params.id;
 
   try {
-    const [evento] = await db.execute('SELECT * FROM Eventos WHERE id_evento = ? AND evento_terminado = 0', [idEvento]);
+    const [evento] = await db.execute('SELECT * FROM eventos WHERE id_evento = ? AND evento_terminado = 0', [idEvento]);
 
     if (evento.length === 0) {
       return res.status(404).json({ message: 'Evento no encontrado' });
@@ -64,12 +64,12 @@ const create = async (req, res) => {
     } = req.body;
 
     // Obtener el ID del administrador
-    const [created_byResult] = await db.execute('SELECT id_administrador FROM Administradores WHERE correo = ? limit 1', [created_bySub]);
-    const created_by = created_byResult[0] ? created_byResult[0].idAdministrador : null;
+    const [created_byResult] = await db.execute('SELECT id_administrador FROM administradores WHERE correo = ? limit 1', [created_bySub]);
+    const created_by = created_byResult[0] ? created_byResult[0].id_administrador : null;
 
     // Insertar el evento en la base de datos
     await db.execute(
-      'INSERT INTO Eventos (id_bovino, titulo, asunto, descripcion, fecha_reinsidio, created_by, fecha_reporte) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO eventos (id_bovino, titulo, asunto, descripcion, fecha_reinsidio, created_by, fecha_reporte) VALUES (?, ?, ?, ?, ?, ?, ?)',
       [idBovino, tituloEvento, asunto || null, descripcion || null, fechaTerminar || null, created_by, fecha_Reporte || null]
     );
 
@@ -92,7 +92,7 @@ const update = async (req, res) => {
   const hoy = new Date();
   try {
     await db.execute(
-      'UPDATE Eventos SET titulo = ?, asunto = ?, descripcion = ?, fecha_reinsidio = ?, updated_at = ? WHERE id_evento = ?',
+      'UPDATE eventos SET titulo = ?, asunto = ?, descripcion = ?, fecha_reinsidio = ?, updated_at = ? WHERE id_evento = ?',
       [titulo, asunto || null, descripcion || null, fecha_Reinsidio || null, hoy, idEvento]
     );
 
@@ -114,7 +114,7 @@ const deleteLogico = async (req, res) => {
   const hoy = new Date();
 
   try {
-    await db.execute('UPDATE Eventos SET deleted = 1, deleted_at = ? WHERE id_evento = ?', [hoy, idEvento]);
+    await db.execute('UPDATE eventos SET deleted = 1, deleted_at = ? WHERE id_evento = ?', [hoy, idEvento]);
 
     return res.status(200).json({
       message: 'Evento eliminado (lógicamente) correctamente',
@@ -132,7 +132,7 @@ const eventoTerminado = async (req, res) => {
   const hoy = new Date();
 
   try {
-    await db.execute('UPDATE Eventos SET evento_terminado = 1, updated_at = ? WHERE id_evento = ?', [hoy, idEvento]);
+    await db.execute('UPDATE eventos SET evento_terminado = 1, updated_at = ? WHERE id_evento = ?', [hoy, idEvento]);
 
     return res.status(200).json({
       message: 'Evento eliminado (lógicamente) correctamente',
@@ -149,7 +149,7 @@ const deleteFisico = async (req, res) => {
   const idEvento = req.params.id;
 
   try {
-    await db.execute('DELETE FROM Eventos WHERE id_evento = ?', [idEvento]);
+    await db.execute('DELETE FROM eventos WHERE id_evento = ?', [idEvento]);
 
     return res.status(200).json({
       message: 'Evento eliminado (físicamente) correctamente',
@@ -166,14 +166,14 @@ const getByBovino = async (req, res) => {
   const idBovino = req.params.id;
 
   try {
-    const [eventos] = await db.execute('SELECT titulo,asunto,fecha_reporte,descripcion,fecha_reinsidio FROM Eventos WHERE id_bovino = ? ', [idBovino]);
+    const [eventos] = await db.execute('SELECT titulo,asunto,fecha_reporte,descripcion,fecha_reinsidio FROM eventos WHERE id_bovino = ? ', [idBovino]);
 
     if (eventos.length === 0) {
-      return res.status(404).json({ message: 'Eventos no encontrados' });
+      return res.status(404).json({ message: 'eventos no encontrados' });
     }
 
     return res.status(200).json({
-      message: 'Eventos obtenidos correctamente',
+      message: 'eventos obtenidos correctamente',
       eventos,
     });
   } catch (error) {
@@ -187,17 +187,17 @@ const eventosSinTerminar = async (req, res) => {
   try {
     const [eventos] = await db.execute(`
       SELECT E.id_evento as id, E.id_bovino, E.titulo, E.asunto, E.fecha_reporte, E.descripcion, E.fecha_reinsidio, E.evento_terminado, B.arete_bovino , B.nombre
-      FROM Eventos E
-      JOIN Bovino B ON E.id_bovino = B.id_bovino
+      FROM eventos E
+      JOIN bovino B ON E.id_bovino = B.id_bovino
       WHERE E.evento_terminado = 0 AND E.deleted = 0
     `);
 
     if (eventos.length === 0) {
-      return res.status(404).json({ message: 'Eventos no encontrados' });
+      return res.status(404).json({ message: 'eventos no encontrados' });
     }
 
     return res.status(200).json({
-      message: 'Eventos obtenidos correctamente',
+      message: 'eventos obtenidos correctamente',
       eventos,
     });
   } catch (error) {
@@ -221,8 +221,8 @@ const muyImportante = async (req, res) => {
         e.fecha_reinsidio,
         b.nombre as nombreBovino,
         b.arete_bovino
-      FROM Eventos e
-      JOIN Bovino b ON e.id_bovino = b.id_bovino
+      FROM eventos e
+      JOIN bovino b ON e.id_bovino = b.id_bovino
       WHERE 
         e.evento_terminado = 0
         AND e.deleted = 0
@@ -234,7 +234,7 @@ const muyImportante = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: 'Eventos obtenidos correctamente',
+      message: 'eventos obtenidos correctamente',
       eventos,
     });
   } catch (error) {
