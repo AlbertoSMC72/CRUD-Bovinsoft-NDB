@@ -76,6 +76,7 @@ const getById = async (req, res) => {
 };
 
 const create = async (req, res) => {
+    await db.beginTransaction();
     try {
         const { siniiga, areteBovino, areteToro, areteVaca, nombre, raza, genero, fechaNacimiento, fotoBovino, pedigri, tipoNacimiento, adminCorreo } = req.body;
 
@@ -93,11 +94,13 @@ const create = async (req, res) => {
             'INSERT INTO bovino (siniiga, arete_bovino, id_toro, id_vaca, nombre, raza, genero, fecha_nacimiento, foto_perfil, pedigri, tipo_nacimiento, created_by ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
             [siniiga || null, areteBovino || "No definido", idToro, idVaca, nombre, raza, genero, fechaNacimiento, fotoBovino || null, pedigri || null, tipoNacimiento, created_by]
         );
+        await db.commit();
 
         return res.status(201).json({
             message: 'bovino creada exitosamente',
         });
     } catch (error) {
+        await db.rollback();
         console.error("Error al crear bovino:", error.message);
         return res.status(500).json({
             message: 'bovino un error en el servidor',
@@ -111,6 +114,7 @@ const create = async (req, res) => {
 const update = async (req, res) => {
     const idBovino = req.params.id;
     const datosActualizados = req.body;
+    await db.beginTransaction();
     try {
         const { siniiga, fotoPerfil, areteBovino, areteToro, areteVaca, pedigri } = datosActualizados;
 
@@ -144,11 +148,12 @@ const update = async (req, res) => {
         ];
 
         await db.execute(updateQuery, updateParams);
-
+        await db.commit();
         return res.status(200).json({
             message: 'bovino actualizado correctamente',
         });
     } catch (error) {
+        await db.rollback();
         return res.status(500).json({
             message: 'Hubo un error en el servidor',
             error: error.message,
@@ -159,16 +164,17 @@ const update = async (req, res) => {
 
 const deleteLogico = async (req, res) => {
     const idBovino = req.params.id;
-
+    await db.beginTransaction();
     try {
         const fechaBorrado = new Date();
 
         await db.execute('UPDATE bhovino SET deleted = 1, deleted_at = ? WHERE id_bovino = ?', [fechaBorrado, idBovino]);
-
+        await db.commit();
         return res.status(200).json({
             message: 'bovino eliminada correctamente (lógicamente)',
         });
     } catch (error) {
+        await db.rollback();
         return res.status(500).json({
             message: 'Hubo un error en el servidor',
             error: error.message,
@@ -178,16 +184,17 @@ const deleteLogico = async (req, res) => {
 
 const deleteLogicoInverso = async (req, res) => {
     const idBovino = req.params.id;
-
+    await db.beginTransaction();
     try {
         const fechaBorrado = new Date();
 
         await db.execute('UPDATE bovino SET deleted = 0, deleted_at = ? WHERE id_bovino = ?', [fechaBorrado, idBovino]);
-
+        await db.commit();
         return res.status(200).json({
             message: 'bovino restaurado correctamente ',
         });
     } catch (error) {
+        await db.rollback();
         return res.status(500).json({
             message: 'Hubo un error en el servidor',
             error: error.message,
@@ -197,14 +204,15 @@ const deleteLogicoInverso = async (req, res) => {
 
 const deleteFisico = async (req, res) => {
     const idBovino = req.params.id;
-
+    await db.beginTransaction();
     try {
         await db.execute('DELETE FROM bovino WHERE id_bovino = ?', [idBovino]);
-
+        await db.commit();
         return res.status(200).json({
             message: 'bovino eliminada correctamente (físicamente)',
         });
     } catch (error) {
+        await db.rollback();
         return res.status(500).json({
             message: 'Hubo un error en el servidor',
             error: error.message,

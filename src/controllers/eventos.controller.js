@@ -63,21 +63,37 @@ const create = async (req, res) => {
       fecha_Reporte,
     } = req.body;
 
-    // Obtener el ID del administrador
-    const [created_byResult] = await db.execute('SELECT id_administrador FROM administradores WHERE correo = ? limit 1', [created_bySub]);
-    const created_by = created_byResult[0] ? created_byResult[0].id_administrador : null;
+    await db.beginTransaction();
 
-    // Insertar el evento en la base de datos
-    await db.execute(
-      'INSERT INTO eventos (id_bovino, titulo, asunto, descripcion, fecha_reinsidio, created_by, fecha_reporte) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [idBovino, tituloEvento, asunto || null, descripcion || null, fechaTerminar || null, created_by, fecha_Reporte || null]
-    );
+    try {
+      // Obtener el ID del administrador
+      const [created_byResult] = await db.execute('SELECT id_administrador FROM administradores WHERE correo = ? LIMIT 1', [created_bySub]);
+      const created_by = created_byResult[0] ? created_byResult[0].id_administrador : null;
 
-    return res.status(201).json({
-      message: 'Evento creado exitosamente',
-    });
+      // Insertar el evento en la base de datos
+      await db.execute(
+        'INSERT INTO eventos (id_bovino, titulo, asunto, descripcion, fecha_reinsidio, created_by, fecha_reporte) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [idBovino, tituloEvento, asunto || null, descripcion || null, fechaTerminar || null, created_by, fecha_Reporte || null]
+      );
+
+      // Confirmar la transacción
+      await db.commit();
+
+      return res.status(201).json({
+        message: 'Evento creado exitosamente',
+      });
+    } catch (error) {
+      // Revertir la transacción en caso de error
+      await db.rollback();
+
+      console.error('Error en la función create:', error);
+      return res.status(500).json({
+        message: 'Hubo un error en el servidor',
+        error: error.message,
+      });
+    }
   } catch (error) {
-    console.error('Error en la función create:', error);
+    console.error('Error al iniciar la transacción:', error);
     return res.status(500).json({
       message: 'Hubo un error en el servidor',
       error: error.message,
@@ -88,19 +104,23 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
   const idEvento = req.params.id;
-  const {titulo, asunto, descripcion, fecha_Reinsidio } = datosActualizados;
+  const { titulo, asunto, descripcion, fecha_Reinsidio } = datosActualizados;
   const hoy = new Date();
+
+  await db.beginTransaction();
   try {
     await db.execute(
       'UPDATE eventos SET titulo = ?, asunto = ?, descripcion = ?, fecha_reinsidio = ?, updated_at = ? WHERE id_evento = ?',
       [titulo, asunto || null, descripcion || null, fecha_Reinsidio || null, hoy, idEvento]
     );
 
+    await db.commit();
     return res.status(200).json({
       message: 'Evento actualizado correctamente',
     });
 
   } catch (error) {
+    await db.rollback();
     return res.status(500).json({
       message: 'Hubo un error en el servidor al actualizar el evento',
       error: error.message,
@@ -112,14 +132,15 @@ const update = async (req, res) => {
 const deleteLogico = async (req, res) => {
   const idEvento = req.params.id;
   const hoy = new Date();
-
+  await db.beginTransaction();
   try {
     await db.execute('UPDATE eventos SET deleted = 1, deleted_at = ? WHERE id_evento = ?', [hoy, idEvento]);
-
+    await db.commit();
     return res.status(200).json({
       message: 'Evento eliminado (lógicamente) correctamente',
     });
   } catch (error) {
+    await db.rollback();
     return res.status(500).json({
       message: 'Hubo un error en el servidor',
       error: error.message,
@@ -130,14 +151,16 @@ const deleteLogico = async (req, res) => {
 const eventoTerminado = async (req, res) => {
   const idEvento = req.params.id;
   const hoy = new Date();
-
+  await db.beginTransaction();
   try {
     await db.execute('UPDATE eventos SET evento_terminado = 1, updated_at = ? WHERE id_evento = ?', [hoy, idEvento]);
 
+    await db.commit();
     return res.status(200).json({
       message: 'Evento eliminado (lógicamente) correctamente',
     });
   } catch (error) {
+    await db.rollback();
     return res.status(500).json({
       message: 'Hubo un error en el servidor',
       error: error.message,
@@ -147,14 +170,15 @@ const eventoTerminado = async (req, res) => {
 
 const deleteFisico = async (req, res) => {
   const idEvento = req.params.id;
-
+  await db.beginTransaction();
   try {
     await db.execute('DELETE FROM eventos WHERE id_evento = ?', [idEvento]);
-
+    await db.commit();  
     return res.status(200).json({
       message: 'Evento eliminado (físicamente) correctamente',
     });
   } catch (error) {
+    await db.rollback();
     return res.status(500).json({
       message: 'Hubo un error en el servidor',
       error: error.message,

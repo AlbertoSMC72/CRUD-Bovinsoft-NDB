@@ -39,6 +39,7 @@ const getById = async (req, res) => {
 };
 
 const create = async (req, res) => {
+  await db.beginTransaction();
   try {
     const { idBovino, estado } = req.body;
 
@@ -53,11 +54,12 @@ const create = async (req, res) => {
 
     // Si no existe, crear el nuevo evento
     await db.execute('INSERT INTO estado (id_bovino, estado) VALUES (?, ?)', [idBovino, estado]);
-
+    await db.commit();
     return res.status(201).json({
       message: 'estado creado exitosamente',
     });
   } catch (error) {
+    await db.rollback();
     return res.status(500).json({
       message: 'Hubo un error en el servidor',
       error: error.message,
@@ -68,17 +70,18 @@ const create = async (req, res) => {
 const update = async (req, res) => {
   const idEstado = req.params.id;
   const datosActualizados = req.body;
-
+  await db.beginTransaction();
   try {
 
     const { idBovino, estado } = datosActualizados;
 
     await db.execute('UPDATE estado SET id_bovino = ?, estado = ? WHERE id_estado = ?', [idBovino, estado, idEstado]);
-
+    await db.commit();
     return res.status(200).json({
       message: 'estado actualizado correctamente',
     });
   } catch (error) {
+    await db.rollback();
     return res.status(500).json({
       message: 'Hubo un error en el servidor',
       error: error.message,
@@ -88,14 +91,15 @@ const update = async (req, res) => {
 
 const deleteLogico = async (req, res) => {
   const idEstado = req.params.id;
-
+  await db.beginTransaction();
   try {
     await db.execute('UPDATE estado SET deleted = true WHERE id_estado = ?', [idEstado]);
-
+    await db.commit();
     return res.status(200).json({
       message: 'estado eliminado correctamente (lógicamente)',
     });
   } catch (error) {
+    await db.rollback();
     return res.status(500).json({
       message: 'Hubo un error en el servidor',
       error: error.message,
@@ -105,14 +109,15 @@ const deleteLogico = async (req, res) => {
 
 const deleteFisico = async (req, res) => {
   const idEstado = req.params.id;
-
+  await db.beginTransaction();
   try {
     await db.execute('DELETE FROM estado WHERE id_estado = ?', [idEstado]);
-
+    await db.commit();
     return res.status(200).json({
       message: 'estado eliminado correctamente (físicamente)',
     });
   } catch (error) {
+    await db.rollback();
     return res.status(500).json({
       message: 'Hubo un error en el servidor',
       error: error.message,

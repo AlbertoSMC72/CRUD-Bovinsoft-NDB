@@ -53,14 +53,15 @@ const create = async (req, res) => {
     try {
         const password = bcrypt.hashSync(req.body.password,  parseInt(saltosBcrypt))
         const correo = req.body.correo
-
+        await db.beginTransaction();
         try {
             await db.execute('INSERT INTO administradores (correo, password) VALUES (?, ?)', [correo, password]);
-
+            await db.commit();
             return res.status(201).json({
                 message: 'Administrador creado exitosamente',
             });
         } catch (error) {
+            await db.rollback();
             return res.status(406).json({
                 message: 'Hubo un error al crear el administrador',
                 error: error.message,
@@ -79,15 +80,16 @@ const update = async (req, res) => {
         const adminId = req.params.id;
         const { correo, password } = req.body;
         const hoy = new Date();
-
+        await db.beginTransaction();
         try {
             await db.execute('UPDATE administradores SET correo = ?, password = ?, updated_at = ? WHERE id_administrador = ?',
                 [correo, password, hoy, adminId]);
-
+            await db.commit();
             return res.status(200).json({
                 message: 'Administrador actualizado correctamente',
             });
         } catch (error) {
+            await db.rollback();
             return res.status(406).json({
                 message: 'Hubo un error al intentar actualizar al administrador',
                 error: error.message,
@@ -105,14 +107,15 @@ const update = async (req, res) => {
 const deleteFisico = async (req, res) => {
     try {
         const adminId = req.params.id;
-
+        await db.beginTransaction();
         try {
             await db.execute('DELETE FROM administradores WHERE id_administrador = ?', [adminId]);
-
+            await db.commit();
             return res.status(200).json({
                 message: 'Administrador eliminado (físicamente) correctamente',
             });
         } catch (error) {
+            await db.rollback();
             return res.status(406).json({
                 message: 'Hubo un error al intentar eliminar al administrador',
                 error: error.message,
